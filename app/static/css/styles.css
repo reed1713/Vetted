@@ -1,0 +1,71 @@
+#openbuttons {
+display: inline-block;
+padding: 6px 12px;
+margin-bottom: 30px;
+font-size: 14px;
+font-weight: 400;
+line-height: 1.42857143;
+text-align: center;
+white-space: nowrap;
+vertical-align: middle;
+cursor: pointer;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+background-image: none;
+border: 1px solid transparent;
+border-radius: 20px;
+}
+thead {
+display: table-header-group;
+vertical-align: middle;
+border-color: inherit;
+background-color: #919191
+}
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+#priority {
+	width: 110px;
+}
+#status {
+	width: 110px;
+}
+
+#notes {
+	height: 150px
+}
+#newlinei{
+	height: 300px;
+}
+#name{
+	width: 400px;
+}
+#email{
+	width: 400px;
+}
+#password{
+	width: 400px;
+}
+#confirm{
+	width: 400px;
+}
+#role{
+	width: 100px;
+}
+#whitelist_field{
+	height: 400px;
+	width: 400px;
+}
+#keywordlist_field{
+	height: 400px;
+	width: 400px;
+}
+#sourceconfidence{
+	width: 110px;
+}
+#feedsource_type{
+	width: 150px;
+}

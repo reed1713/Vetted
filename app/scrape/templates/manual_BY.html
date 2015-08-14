@@ -1,0 +1,60 @@
+<!-- app/scrape/templates/manual_BY.html -->
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Manual <span class="label label-primary">Binary - Yara</span>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{{ url_for('scrape.manual_NBI') }}">Network - Bro Intel</a></li>
+  <li role="presentation"><a href="{{ url_for('scrape.manual_NS') }}">Network - Snort</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('scrape.manual_BY') }}">Binary - Yara</a></li>
+</ul>
+
+<form action="{{ url_for('scrape.manual_BY') }}" method="post" enctype="multipart/form-data">
+<div class="lead"></div>
+
+      {{ form.csrf_token }} 
+
+        {{ form.source.label }}
+
+        {{ wtf.form_field(form.source, placeholder="source") }}
+
+        {{ form.priority.label }}
+
+        {{ wtf.form_field(form.priority) }}
+
+        {{ form.status.label }}
+
+        {{ wtf.form_field(form.status) }}
+
+        {{ form.strtags.label }}
+
+        {{ wtf.form_field(form.strtags, placeholder="tags") }}
+
+        {{ form.notes.label }}
+
+        {{ wtf.form_field(form.notes, placeholder="notes") }}
+
+        <h4><span class="label label-primary" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n}\r\n\r\n. Seperate yara signatures with a single space."><b>Binary - Yara indicators *</b></span></h4>
+
+        {{ wtf.form_field(form.newlinei, placeholder="indicators") }}
+
+
+    <div class="footer">
+      <hr>
+      <button class="btn btn-lg btn-success" type="submit">Submit</button>
+    </div>
+  </form>
+
+<script type="text/javascript">
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+{% endblock %}

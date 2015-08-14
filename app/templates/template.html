@@ -1,0 +1,134 @@
+<!-- app/templates/template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <!-- styles -->
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
+
+    <!-- scripts -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
+  </head>
+
+<body role="document">
+
+{% if session.logged_in %}
+
+     <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000">
+
+        <div class="logo">
+            <ul class="nav navbar-nav navbar-left">
+                <img alt="co-logo" src="/static/images/headerLogo-logo-int.png" width="100"
+                height="50" style="
+                padding-right: 20px;
+                padding-left: 20px;
+                    ">
+            </ul>
+        </div>
+      <div class="container">
+        <div class="navbar-header">
+
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ url_for('welcome.welcome') }}">Vetted</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Research <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ url_for('research.TI_research_feeds') }}">Feeds</a></li>
+              </ul>
+            </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Create <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ url_for('scrape.scrape') }}">Auto</a></li>
+                    <li><a href="{{ url_for('scrape.manual_NBI') }}">Manual</a></li>
+              </ul>
+            </li>
+
+            <li>
+              <a href="{{ url_for('status.open_status') }}" role="button" aria-expanded="false">Status</a>
+            </li>
+
+           <li><a href="{{ url_for('lists.whitelist_save') }}">Lists</a></li>
+
+            {% if session.role == "admin" %}
+                <li><a href="{{ url_for('users.register') }}">Manage Users</a></li>
+            {% endif %}
+
+          </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="{{ url_for('users.user_info', user_name = username) }}">{{username}} Info</a></li>
+
+            <li style="background-color: rgb(16, 66, 142);"><a href="{{ url_for('users.logout') }}">LOGOUT</a></li>
+        </ul>
+
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+<br>
+
+{% endif %}
+
+    <div class="container">
+      <div class="content">
+        {% for message in get_flashed_messages() %}
+        <br>
+        <div class="alert alert-info" role="alert">
+          <div class="flash"><strong>Info:</strong> {{ message }}</div>
+        </div>
+        {% endfor %}
+
+        {% if error %}
+        <br>
+        <div class="alert alert-danger" role="alert">
+          <div class="error"><strong>Error:</strong> {{ error }}</div>
+        </div>
+        {% endif %}
+
+        {% for e in multiple_errors %}
+        <br>
+        <div class="alert alert-danger" role="alert">
+          <div class="flash"><strong>Error:</strong> {{ e }}</div>
+        </div>
+        {% endfor %}
+
+        {% block content %}
+        {% endblock %}
+
+      </div>
+
+    </div>
+
+</body>
+ 
+</html>

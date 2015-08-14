@@ -1,0 +1,86 @@
+<!-- /app/research/templates/feed_sources.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Feed <span class="label label-primary">sources</span>
+
+  <div class="dropdown" style="float: right">
+    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      Feed types
+      <span class="caret"></span>
+    </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
+      <li><a href="{{ url_for('research.TI_research_feeds') }}">Tactical Intel</a></li>
+    <li role="separator" class="divider"></li>
+      <li><a href="{{ url_for('research.SI_research_feeds') }}">Strategic Intel</a></li>
+  </ul>
+  </div>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="{{ url_for('research.list_feeds') }}">Feed source list</a></li>
+  <li role="presentation"><a href="{{ url_for('research.new_feed') }}">New/edit feed source</a></li>
+</ul>
+
+<h1>Feed list</h1>
+<div class="row">
+  <div class="entries">
+  <br>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th width="5%">id</th>
+        <th width="40%">feed source</th>
+        <th width="20%">feed type</th>
+        <th width="11%">feed confidence</th>
+        <th width="11%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for f in feed_src %}
+      <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.feedsource }}</td>
+        <td>{{ f.feedsource_type }}</td>
+        <td>{{ f.sourceconfidence }}</td>
+        <td>
+          <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('research.delete_feedsource', feedsource_id = f.id) }}">Delete</a>
+          <a class="btn btn-primary" name="openbuttons" id="openbuttons" href="{{ url_for('research.edit_feed', feed_id = f.id) }}">Edit</a>
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('table').dataTable({
+    "aaSorting": [[ 0, "desc" ]],
+    "iDisplayStart": 50,
+    "aLengthMenu": [[50, 100, -1], [50, 100, 'All']],
+    'bPaginate':true
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).on("click", ".btn-danger", function(e) {
+  var link = $(this).attr("href"); // "get" the intended link in a var
+  e.preventDefault();
+  bootbox.confirm("Are you sure you want to delete this feed source?", function(result) {
+  if (result) {
+    document.location.href = link;  // if result, "set" the document location
+                }
+  });
+});
+</script>
+
+
+{% endblock %}

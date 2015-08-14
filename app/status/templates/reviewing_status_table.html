@@ -1,0 +1,226 @@
+<!-- /app/status/templates/reviewing_status_table.html -->
+
+{% extends "template.html" %}
+
+{% block content %}
+
+<ol class="breadcrumb">
+  <li><a href="{{ url_for('status.open_status') }}">Open</a></li>
+  <li><class="active">Reviewing</a></li>
+  <li><a href="{{ url_for('status.vetted_status') }}">Vetted</a></li>
+  <li><a href="{{ url_for('status.stale_status') }}">Stale</a></li>
+  <li><a href="{{ url_for('status.all_status') }}">All</a></li>
+</ol>
+
+<div class="page-header">
+  <h1>Status <span class="label label-danger">REVIEWING</span>
+  </h1>
+</div>
+
+<div class="btn-group" data-toggle="buttons">
+  <label class="btn btn-primary active" id="NBI">
+    <input type="checkbox" autocomplete="off"> Network - Bro Intel
+  </label>
+  <label class="btn btn-primary active" id="NS">
+    <input type="checkbox" autocomplete="off"> Network - Snort
+  </label>
+  <label class="btn btn-primary active" id="BY">
+    <input type="checkbox" autocomplete="off"> Binary - Yara
+  </label>
+</div>
+<br>
+
+<div class="row" id="bro_intel_div">
+  <h3>Network -<small> BRO INTEL</small></h3>
+  <div class="entries">
+  <div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr class="active">
+        <th width="8%">date/time UTC</th>
+        <th width="10%">reviewing</th>
+        <th width="25%">source</th>
+        <th width="8%">priority</th>
+        <th width="8%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    {% for o in NBI_ids %}
+      <tr>
+        <td>{{ o.created_date }}</td>
+        <td>{{ o.in_review_by }}</td>
+        <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
+        <td>
+          {% if o.priority == 'medium' %}
+          <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'high' %}
+          <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'low' %}
+          <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
+          {% endif %}
+        </td>
+        <td align="center">
+          <br>
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_reviewing_status', reviewing_id = o.type_hash) }}">Edit</a>
+            {% if session.role == "admin" %}
+            <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('status.delete_reviewing_status', reviewing_id = o.type_hash) }}">Delete</a>
+            {% endif %}
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<div class="row" id="snort_div">
+  <h3>Network -<small> SNORT</small></h3>
+  <div class="entries">
+  <div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr class="active">
+        <th width="8%">date/time UTC</th>
+        <th width="10%">reviewing</th>
+        <th width="25%">source</th>
+        <th width="8%">priority</th>
+        <th width="8%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    {% for o in NS_ids %}
+      <tr>
+        <td>{{ o.created_date }}</td>
+        <td>{{ o.in_review_by }}</td>
+        <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
+        <td>
+          {% if o.priority == 'medium' %}
+          <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'high' %}
+          <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'low' %}
+          <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
+          {% endif %}
+        </td>
+        <td align="center">
+          <br>
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_reviewing_status', reviewing_id = o.type_hash) }}">Edit</a>
+            {% if session.role == "admin" %}
+            <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('status.delete_reviewing_status', reviewing_id = o.type_hash) }}">Delete</a>
+            {% endif %}
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<div class="row" id="yara_div">
+  <h3>Binary -<small> YARA</small></h3>
+  <div class="entries">
+  <div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr class="active">
+        <th width="8%">date/time UTC</th>
+        <th width="10%">reviewing</th>
+        <th width="25%">source</th>
+        <th width="8%">priority</th>
+        <th width="8%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    {% for o in BY_ids %}
+      <tr>
+        <td>{{ o.created_date }}</td>
+        <td>{{ o.in_review_by }}</td>
+        <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
+        <td>
+          {% if o.priority == 'medium' %}
+          <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'high' %}
+          <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
+          {% elif o.priority == 'low' %}
+          <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
+          {% endif %}
+        </td>
+        <td align="center">
+          <br>
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_reviewing_status', reviewing_id = o.type_hash) }}">Edit</a>
+            {% if session.role == "admin" %}
+            <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('status.delete_reviewing_status', reviewing_id = o.type_hash) }}">Delete</a>
+            {% endif %}
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+var button = document.getElementById('NBI'); 
+
+button.onclick = function() {
+    var div = document.getElementById('bro_intel_div');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+
+var button = document.getElementById('NS'); 
+
+button.onclick = function() {
+    var div = document.getElementById('snort_div');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+
+var button = document.getElementById('BY'); 
+
+button.onclick = function() {
+    var div = document.getElementById('yara_div');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+
+$(document).ready(function(){
+  $('table').dataTable({
+    "aaSorting": [[ 0, "desc" ]],
+    "iDisplayStart": 5,
+    "aLengthMenu": [[5, 10, -1], [5, 10, 'All']],
+    "bPaginate":true,
+    "iDisplayStart":0,
+  });
+});
+
+$(document).on("click", ".btn-danger", function(e) {
+  var link = $(this).attr("href"); // "get" the intended link in a var
+  e.preventDefault();
+  bootbox.confirm("Are you sure you want to delete?", function(result) {
+  if (result) {
+    document.location.href = link;  // if result, "set" the document location
+                }
+  });
+});
+</script>
+
+{% endblock %}

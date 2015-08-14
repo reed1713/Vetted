@@ -1,0 +1,52 @@
+<!-- /app/research/templates/edit_feed.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Feed <span class="label label-primary">sources</span>
+
+  <div class="dropdown" style="float: right">
+    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      Feed types
+      <span class="caret"></span>
+    </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
+      <li><a href="{{ url_for('research.TI_research_feeds') }}">Tactical Intel</a></li>
+    <li role="separator" class="divider"></li>
+      <li><a href="{{ url_for('research.SI_research_feeds') }}">Strategic Intel</a></li>
+  </ul>
+  </div>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{{ url_for('research.list_feeds') }}">Feed source list</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('research.new_feed') }}">New/edit feed source</a></li>
+</ul>
+
+<h1>Edit feed</h1>
+<form class="form-signin" role="form" method="post" action="">
+<div class="lead"></div>
+  {{ form.csrf_token }}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <b>{{ e.feedsource }}</b>
+  </div>
+</div>
+  <p>
+    {{ form.sourceconfidence.label }}: 
+    {{ wtf.form_field(form.sourceconfidence) }}
+  </p>
+  <p>
+    {{ form.feedsource_type.label }}: 
+    {{ wtf.form_field(form.feedsource_type) }}
+  </p>
+  <button class="btn btn-md btn-success" type="submit">Submit</button>
+  <br>
+  <br>
+</form>
+
+{% endblock %}

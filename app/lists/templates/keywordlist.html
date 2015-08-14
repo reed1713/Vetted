@@ -1,0 +1,45 @@
+<!-- app/lists/templates/whitelist.html -->
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1>List <small> stuff</small> 
+  </h1>
+</div>
+
+<ul class="nav nav-tabs">
+  <li id="whitelist" role="presentation"><a href="{{ url_for('lists.whitelist_save') }}">Whitelist</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('lists.keywordlist_save') }}">Keywords</a></li>
+</ul>
+
+<br>
+
+<form action="{{ url_for('lists.keywordlist_save') }}" method="post">
+
+	{{ form.csrf_token }}
+
+	{{ wtf.form_field(form.keywordlist_field) }}
+
+  <div class="footer">
+    <hr>
+     <input class="btn btn-md btn-primary" type="submit" value="Save">
+  </div>
+
+</form>
+
+<script type="text/javascript">
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+{% endblock %}
+
+
+
+
+
+

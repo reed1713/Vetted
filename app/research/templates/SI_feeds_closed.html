@@ -1,0 +1,108 @@
+<!-- app/research/templates/SI_feeds_closed.html -->
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Strategic Intel <span class="label label-primary">feeds</span>
+
+  <div class="dropdown" style="float: right">
+    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      Feed types
+      <span class="caret"></span>
+    </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
+      <li><a href="{{ url_for('research.TI_research_feeds') }}">Tactical Intel</a></li>
+    <li role="separator" class="divider"></li>
+      <li><a href="{{ url_for('research.SI_research_feeds') }}">Strategic Intel</a></li>
+  </ul>
+  </div>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{{ url_for('research.SI_research_feeds') }}">Open</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('research.SI_closed_feeds') }}">Closed</a></li>
+</ul>
+
+<h3><span class="label label-default" >Last update: {{ lt }}</span>
+{% if session.role == "admin" %}
+<div class="dropdown" style="float: right">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Options
+    <span class="caret"></span>
+  </button>
+<ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
+    <li><a href="{{ url_for('research.list_feeds') }}">Feed sources</a></li>
+  <li role="separator" class="divider"></li>
+    <li><a id="update_feeds" href="{{ url_for('research.SI_update_feeds') }}">Update feeds</a></li>
+</ul>
+</div>
+{% endif %}
+<br>
+<br>
+
+{% for e in entries %}
+
+{% if e.feed_confidence == 1 %}
+  <div class="panel panel-danger">
+{% elif e.feed_confidence == 2 %}
+  <div class="panel panel-warning">
+{% elif e.feed_confidence == 3 %}
+  <div class="panel panel-success">
+{% endif %}
+    <div class="panel-heading" role="tab" id="headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo-{{ e.id }}" aria-expanded="false" aria-controls="collapseTwo">
+          {{ e.feed_title }}
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo-{{ e.id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <div class="panel-body">
+
+        <h5>
+        <b>Published on: </b> {{ e.feed_time }}
+        </h5>
+
+        <h5>
+        <b> Link: </b><a href="{{ e.feed_link }}" target="_blank"> {{ e.feed_link }}</a>
+        </h5>
+
+        <h5>
+        <b> Source: </b> {{e.feed_feedsource }}
+        </h5>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+    $('.collapse').collapse({
+  toggle: false
+    })
+</script>
+
+{% endfor %}
+
+<script type="text/javascript">
+$(document).on("click", "#update_feeds", function(e) {
+  var link = $(this).attr("href"); // "get" the intended link in a var
+  e.preventDefault();
+  bootbox.confirm("Are you sure you want to update SI feeds? May take some time.", function(result) {
+  if (result) {
+    document.location.href = link;  // if result, "set" the document location
+                }
+  });
+});
+</script>
+
+
+{% endblock %}
+
+
+
+
+
+

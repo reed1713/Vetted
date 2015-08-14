@@ -1,0 +1,65 @@
+##INDUSTRIES##
+^ICS$
+government
+retail
+financial
+education
+high tech
+##MALWARE##
+zoxpng
+Gholee
+gh0st
+njrat
+xtreme rat
+sogu
+cryptovault
+poison ivy
+carbanak
+plugx
+cryptowall
+Dexter
+Project Hook
+Alina
+ChewBacca
+JackPoS
+VSkimmer
+HawkEye Logger
+Cyborg Logger
+CyberGate
+DarkComet
+NanoCore
+Grabit
+BlackEnergy
+havex
+hikit
+##THREAT_GROUPS##
+Axiom group
+Ajax Security Team
+apt ?[0-9]{1,2}
+##REGIONS##
+hong kong
+Tibet
+Middle East
+asia pacific
+east asia
+china
+russia
+israel
+palestine
+united states
+^iran$
+taiwan
+poland
+##MISC##
+spear\-?phishing
+^rat$
+espionage
+^pos$
+state\-sponsored
+cve\-[0-9]{4}\-[0-9]{4,6}
+data\-theft
+dynamic\-?dns
+targeted attack
+Exfiltration
+Targeted Threats
+cyber-crime

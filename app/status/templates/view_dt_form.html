@@ -1,0 +1,99 @@
+<!-- app/status/templates/edit_dt_form.html -->
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+{% if e.d_type == 'Network - Bro Intel' %}
+  <div class="page-header">
+    <h2>Edit <span class="label label-default">Network - Bro Intel</span></h2>
+  </div>
+{% elif e.d_type == 'Network - Snort' %}
+  <div class="page-header">
+    <h2>Edit <span class="label label-warning">Network - Snort</span></h2>
+  </div>
+{% elif e.d_type == 'Binary - Yara' %}
+  <div class="page-header">
+    <h2>Edit <span class="label label-primary">Binary - Yara</span></h2>
+  </div>
+{% endif %}
+
+
+<div class="row">
+
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title"><strong>{{ e.source }}</strong>
+      </h3>
+    </div>
+  </div>
+{% if e.localfile != None %}
+  <form action="{{ url_for('status.download', filename = e.localfile) }}" style="display: inline;">
+    <button class="btn btn-md btn-info" input type="submit">Download original file</button>
+  </form>&nbsp;&nbsp;
+{% endif %}
+{% if e.localtxtfile != None %}
+  <form action="{{ url_for('status.download', filename = e.localtxtfile) }}" style="display: inline;">
+    <button class="btn btn-md btn-primary" input type="submit">Download text file</button>
+  </form>&nbsp;&nbsp;
+{% endif %}
+  {% if e.status == 'vetted' %}
+    <form action="{{ url_for('status.jsondl', source_id = e.type_hash) }}" style="display: inline;">
+      <button class="btn btn-md btn-warning" input type="submit">Download json file</button>
+    </form>&nbsp;&nbsp;
+    <form action="{{ url_for('status.csvdl', source_id = e.type_hash) }}" style="display: inline;">
+      <button class="btn btn-md btn-danger" input type="submit">Download csv file</button>
+    </form>&nbsp;&nbsp;
+  {% endif %}
+</div>
+</div>
+  <br>
+  <form>
+      {{ form.csrf_token }} 
+
+        {{ form.priority.label }}
+
+          <div class="panel panel-default" style="width:100px">
+            <div class="panel-body">
+              <b>{{ e.priority }}</b>
+            </div>
+          </div>
+
+        {{ form.status.label }}
+
+          <div class="panel panel-default" style="width:100px">
+            <div class="panel-body">
+              <b>{{ e.status }}</b>
+            </div>
+          </div>
+
+        {{ form.strtags.label }}
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <b>{{ strtags }}</b>
+            </div>
+          </div>
+
+        {{ form.notes.label }}
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <b>{{ e.notes }}</b>
+            </div>
+          </div>
+
+        {% if e.d_type == 'Network - Bro Intel' %}
+        <h4><span class="label label-default"><b>Network - Bro Intel indicators</b></span></h4>
+        {% elif e.d_type == 'Network - Snort' %}
+        <h4><span class="label label-warning"><b>Network - Snort</b></span></h4>
+        {% elif e.d_type == 'Binary - Yara' %}
+        <h4><span class="label label-primary"><b>Binary - Yara indicators</b></span></h4>
+        {% endif %}
+
+          <b>{{ wtf.form_field(form.newlinei, placeholder="indicators") }}</b>
+
+  </form>
+
+{% endblock %}

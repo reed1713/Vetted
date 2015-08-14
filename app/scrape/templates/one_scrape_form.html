@@ -1,0 +1,51 @@
+<!--app/scrape/templates/one_scrape_form.html-->
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Auto <span class="label label-primary">create</span>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="{{ url_for('scrape.scrape') }}">Url</a></li>
+  <li role="presentation"><a href="{{ url_for('scrape.upload_scrape') }}">Upload</a></li>
+</ul>
+
+<br>
+
+<form method="post" action="">
+  {{ form.csrf_token }}
+  <p> 
+    {{ form.N_BI_checkbx }} Network - Bro Intel &nbsp;
+    {{ form.N_S_checkbx }} Network - Snort &nbsp;
+    {{ form.B_Y_checkbx }} Binary - Yara &nbsp;
+  </p>
+  <p>
+    {{ wtf.form_field(form.url, placeholder="url") }}
+    {{ form.priority.label }}
+    {{ wtf.form_field(form.priority) }}
+    <button class="btn btn-md btn-info" type="submit">Scrape</button>
+  </p>
+</form>
+
+<br>
+
+<div class="list-group">
+  {% if ktags %}
+  <a class="list-group-item">
+    <h4 class="list-group-item-heading">Tags:</h4>
+    <p class="list-group-item-text">{{ ktags }}</p>
+  </a>
+  {% endif %}
+  {% if nbi_out %}
+  <a class="list-group-item">
+    <h4 class="list-group-item-heading">Scraped Bro_Intel indicators:</h4>
+    <p class="list-group-item-text">{{ nbi_out }}</p>
+  </a>
+  {% endif %}
+</div>
+
+{% endblock %}

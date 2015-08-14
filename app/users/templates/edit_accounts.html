@@ -1,0 +1,82 @@
+<!-- /app/users/templates/edit_accounts.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+{% if session.role == "admin" %}
+
+<div class="page-header">
+  <h1>Manage <span class="label label-info">users</span>
+  </h1>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="{{ url_for('users.register') }}">Create account</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('users.edit_accounts') }}">Edit accounts</a></li>
+</ul>
+
+<h1>Accounts</h1>
+<div class="row">
+  <div class="entries">
+  <br>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th width="5%">id</th>
+        <th width="35%">user</th>
+        <th width="35%">email</th>
+        <th width="10%">role</th>
+        <th width="12%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for u in userslist %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.role }}</td>
+        <td>
+          <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('users.delete_user', user_id = u.id) }}">Delete</a>
+          <a class="btn btn-primary" name="openbuttons" id="openbuttons" href="{{ url_for('users.edit_user', user_id = u.id) }}">Edit</a>
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $('table').dataTable({
+    "aaSorting": [[ 0, "desc" ]],
+    "iDisplayStart": 50,
+    "aLengthMenu": [[50, 100, -1], [50, 100, 'All']],
+    'bPaginate':true
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).on("click", ".btn-danger", function(e) {
+  var link = $(this).attr("href"); // "get" the intended link in a var
+  e.preventDefault();
+  bootbox.confirm("Are you sure you want to delete this user?", function(result) {
+  if (result) {
+    document.location.href = link;  // if result, "set" the document location
+                }
+  });
+});
+</script>
+
+{% endif %}
+
+{% if session.role == "user" %}
+  <p>NEED TO BE ADMIN</p>
+{% endif %}
+
+{% endblock %}

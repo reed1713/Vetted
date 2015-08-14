@@ -1,0 +1,6 @@
+/migrations
+*.pyc
+/.ipynb_checkpoints
+*.ipynb
+.DS_Store
+/.idea

@@ -1,0 +1,109 @@
+***SETUP***
+
+#assuming you have python 2.7 already installed
+#developed and tested on ubuntu 14.04 64bit
+
+#install steps for latest postgres version on ubuntu 14.04
+
+#the entire virtualenv process could be skipped if you dont plan running in a virtual environment.
+
+#Create the file 
+/etc/apt/sources.list.d/pgdg.list 
+
+#and add a line for the repository
+
+deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main
+
+Import the repository signing key, and update the package lists
+
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
+  sudo apt-key add -
+sudo apt-get update
+
+#install postgres first
+$ sudo apt-get install postgresql-9.4 postgresql-contrib-9.4
+
+$ sudo apt-get install libpq-dev python-dev python-setuptools python-virtualenv libevent-dev libxslt1-dev libxslt1.1 libxml2-dev libxml2
+
+$ sudo easy_install pip
+
+#create your virtual environment
+
+$ virtualenv ~/Desktop/Projects/Vetted_project
+
+$ sudo pip install virtualenvwrapper 
+
+#add the following to the end of your .bashrc profile file
+export WORKON_HOME=~/Desktop/Projects/
+source /usr/local/bin/virtualenvwrapper.sh
+
+#move the Vetted dir containing the app into the virutal environment Vetted_project dir
+
+$ sudo su - postgres
+
+$ psql template1
+
+#within postgres console
+template1=# CREATE DATABASE vetted_db;
+template1=# CREATE USER vetted WITH PASSWORD 'Vetted12pw';
+template1=# GRANT ALL PRIVILEGES ON DATABASE "vetted_db" to vetted;
+template1=# \q
+
+$ exit
+
+$ workon Vetted_project
+
+# should be in the vetted virtual environment now
+
+$ vim $VIRTUAL_ENV/bin/postactivate
+
+#add and edit accordingly these lines to the postactivate file
+cd ~/Desktop/Projects/Vetted_project/Vetted/
+export DATABASE_URL="postgresql://vetted:Vetted12pw@localhost/vetted_db"
+export APP_SETTINGS="config.DevelopmentConfig"
+export UPLOAD_FOLDER="/home/rreed/Desktop/Projects/Vetted_project/Vetted/app/documents/"
+export SECRET_KEY="this-really-needs-to-be-changed"
+
+$ cd ~/Desktop/Projects/Vetted_project/Vetted/
+
+$ pip install -r requirements.txt
+
+$ deactivate
+
+$ workon Vetted_project
+
+$ python run.py db init
+
+# replace the Vetted_project/lib/python2.7/site-packages/flask_bootstrap/templates/wtf.html with the app/templates/wtf.html template
+
+#if you plan to change the app model
+
+	$ python run.py db migrate
+
+	$ python run.py db upgrade
+
+#connect to db with pgadmin and create admin user with role 'admin'
+#to create admin password see the below python console code, once you 
+#have the salt, paste that into the password column and save the record.
+
+>>> import bcrypt
+>>> salt = bcrypt.gensalt()
+>>> hash = bcrypt.hashpw('admin_password', salt)
+>>> print hash
+
+###EXTRAS###
+
+$ sudo apt-get install pgadmin3 git
+
+#install chrome and sublime text from websites
+
+#edit alembic config to include column type changes. You have to edit function run_migrations_online() in env.py:
+
+def run_migrations_online():
+    # ...
+    context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+  add this ---> compare_type=True
+                )
+#############

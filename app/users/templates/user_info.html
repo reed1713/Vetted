@@ -1,0 +1,27 @@
+<!-- /app/users/templates/register.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+
+<div class="page-header">
+  <h1>User <span class="label label-danger">info</span>
+  </h1>
+</div>
+
+{% for c in current_user %}
+
+<ul class="list-group">
+  <b>
+  <li class="list-group-item list-group-item-default">USERNAME: {{ c.name }}</li>
+  <li class="list-group-item list-group-item-default">EMAIL: {{ c.email }}</li>
+  <li class="list-group-item list-group-item-default">API KEY: <code>{{ c.api_key }}</code></li>
+  </b>
+</ul>
+
+{% endfor %}
+
+{% endblock %}

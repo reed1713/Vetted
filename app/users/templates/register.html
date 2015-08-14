@@ -1,0 +1,53 @@
+<!-- /app/users/templates/register.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+{% if session.role == "admin" %}
+
+<div class="page-header">
+  <h1>Manage <span class="label label-info">users</span>
+  </h1>
+</div>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="{{ url_for('users.register') }}">Create account</a></li>
+  <li role="presentation"><a href="{{ url_for('users.edit_accounts') }}">Edit accounts</a></li>
+</ul>
+
+<h1>Create an account</h1>
+<form class="form-signin" role="form" method="post" action="">
+<div class="lead"></div>
+  {{ form.csrf_token }}
+  <p>
+    {{ wtf.form_field(form.name, placeholder="username") }}
+  </p>
+  <p>
+    {{ wtf.form_field(form.email, placeholder="email address") }}
+  </p>
+  <p>
+    {{ wtf.form_field(form.password, placeholder="password") }}
+  </p>
+  <p>
+    {{ wtf.form_field(form.confirm, placeholder="confirm password") }}
+  </p>
+  <p>
+    {{ form.role.label }}: 
+    {{ wtf.form_field(form.role) }}
+  </p>
+
+  <button class="btn btn-md btn-success" type="submit">Register</button>
+  <br>
+  <br>
+</form>
+
+{% endif %}
+
+{% if session.role == "user" %}
+  <p>NEED TO BE ADMIN</p>
+{% endif %}
+
+{% endblock %}

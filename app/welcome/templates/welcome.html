@@ -1,0 +1,130 @@
+<!-- /app/welcome/templates/welcome.html -->
+
+{% extends "template.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>Welcome to Vetted</h1>
+    <p>An indicator management app. For more info check out the documentation.</p>
+    <p><a class="btn btn-info btn-lg" href="{{ url_for('welcome.documentation') }}" role="button">Read the docs &raquo;</a></p>
+</div>
+
+<div style="width:33%;display:inline-block">
+  <div class="page-header">
+  <h1>Net - Bro Intel <span class="label label-primary"> count</span></h1>
+</div>
+
+<div class="list-group">
+  <h3>
+  <a href="{{ url_for('status.open_status') }}" class="list-group-item">
+    <strong>Open:</strong>
+      <span class="badge">{{ NBI_opencount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.reviewing_status') }}" class="list-group-item">
+    <strong>Reviewing:</strong>
+      <span class="badge">{{ NBI_reviewingcount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.vetted_status') }}" class="list-group-item">
+    <strong>Vetted:</strong>
+      <span class="badge">{{ NBI_vettedcount }}</span>
+      
+  <a href="{{ url_for('status.stale_status') }}" class="list-group-item">
+    <strong>Stale:</strong>
+      <span class="badge">{{ NBI_stalecount }}</span>
+  </a>
+  </h3>
+</div>
+</div>
+
+
+<div style="width:33%;display:inline-block">
+  <div class="page-header">
+  <h1>Net - Snort <span class="label label-primary"> count</span></h1>
+</div>
+
+<div class="list-group">
+  <h3>
+  <a href="{{ url_for('status.open_status') }}" class="list-group-item">
+    <strong>Open:</strong>
+      <span class="badge">{{ NS_opencount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.reviewing_status') }}" class="list-group-item">
+    <strong>Reviewing:</strong>
+      <span class="badge">{{ NS_reviewingcount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.vetted_status') }}" class="list-group-item">
+    <strong>Vetted:</strong>
+      <span class="badge">{{ NS_vettedcount }}</span>
+      
+  <a href="{{ url_for('status.stale_status') }}" class="list-group-item">
+    <strong>Stale:</strong>
+      <span class="badge">{{ NS_stalecount }}</span>
+  </a>
+  </h3>
+</div>
+</div>
+
+
+<div style="width:33%;display:inline-block">
+  <div class="page-header">
+  <h1>Bin - Yara <span class="label label-primary"> count</span></h1>
+</div>
+
+<div class="list-group">
+  <h3>
+  <a href="{{ url_for('status.open_status') }}" class="list-group-item">
+    <strong>Open:</strong>
+      <span class="badge">{{ BY_opencount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.reviewing_status') }}" class="list-group-item">
+    <strong>Reviewing:</strong>
+      <span class="badge">{{ BY_reviewingcount }}</span>
+  </a>
+
+  <a href="{{ url_for('status.vetted_status') }}" class="list-group-item">
+    <strong>Vetted:</strong>
+      <span class="badge">{{ BY_vettedcount }}</span>
+      
+  <a href="{{ url_for('status.stale_status') }}" class="list-group-item">
+    <strong>Stale:</strong>
+      <span class="badge">{{ BY_stalecount }}</span>
+  </a>
+  </h3>
+</div>
+</div>
+
+<br>
+<br>
+
+<div class="panel panel-primary">
+  <div class="panel-heading"><b>Most recent activity</b></div>
+  <table class="table">
+    <thead>
+      
+      <tr class="active">
+        <th width="10%">created time</th>
+        <th width="40%">source</th>
+        <th width="15%">detection type</th>
+        <th width="10%">status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in finalsortedlist %}
+      <tr>
+        <td>{{ m[1] }}</td> 
+        <td><b>{{ m[2] }}</b></td>        
+        <td>{{ m[3] }}</td>
+        <td>{{ m[4] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

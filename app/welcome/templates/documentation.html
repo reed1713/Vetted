@@ -1,0 +1,111 @@
+<!-- /app/welcome/templates/documentation.html -->
+
+{% extends "template.html" %}
+
+{% block content %}
+
+    <div class="container">
+
+      <div class="page-header">
+        <h1>Documentation</h1>
+      </div>
+      <h3>Research</h3>
+      <h4>Tactical Intel</h4>
+      <p>
+        uses python feedparser lib to pull and parse rss and atom feeds. tactical feeds should contain actionable intel sources that often provide useful threat indicators.
+      </p>
+      <h4>Strategic Intel</h4>
+      <p>
+        uses python feedparser lib to pull and parse rss and atom feeds.
+      </p>
+      
+      <hr>
+
+      <h3>Create</h3>
+      <h4>Detection Types</h4>
+      <h5>Network - Bro Intel, Network - Snort, Binary - Yara<h5>
+        <p>
+          <strong>- Bro_Intel types: ADDR, DOMAIN, FILE_HASH, CERT_HASH, EMAIL, FILENAME, URL</strong>
+        </p>
+      <h4>converted file types</h4>
+        <p>
+          <strong>- pdf, docx, html</strong>
+        </p>
+      <h4>scrape notes</h4>
+        <p>
+          - the scraped indicators and tags will appear below the form if successfully scraped. the associated scraped object is located in the Search -open table. large resources may take time to scrape and parse. if a scrape is taking a long time, and you dont see the indicators appear below the form, check the open table.
+        </p>
+
+      <hr>
+
+      <h3>Status</h3>
+      <h4>Edit Detection Type form</h4>
+        <p>
+          <strong>priority:</strong> high, medium, low
+        </p>
+        <p>
+          <strong>status:</strong> open, reviewing, vetted, stale
+        </p>
+        <p>
+          <strong>tags:</strong> seperated by <code>,</code>&nbsp;. leading and trailing whitespaces will be removed from each entry
+        </p>
+        <p>
+          <strong>notes:</strong> notes and stuff
+        </p>
+        <p>
+          <strong>indicators:</strong>
+          <h5>BRO_INTEL</h5>
+           <code> indicator type : indicator value</code>. indicators are split by <code>r\n</code>. all whitespace will be removed, as well as any <code>\r</code> before inputting into to the database. reference the <strong>Bro_Intel type</strong> for the expected indicator type values. 
+          <h5>SNORT<h5>
+            signatures seperate by a space or <code>\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
+          <h5>YARA</h5>
+            signatures seperate by a space or <code>\r\n}\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
+        </p>
+
+      <hr>
+
+      <h3>Lists</h3>
+        <h4>whitelist</h4>
+        <p>
+          any values in this list will be excluded from the bro intel scrape. uses python regex when it runs against the match list. <strong class="text-danger">scrapes will fail if there are any carriage return newline feeds, or whitespaces in this file.</strong>
+        </p>
+        <h4>keywords</h4>
+        <p>
+          any values in this list will be used to create a list of tags. uses python regex when it runs against the match list. <strong class="text-danger">scrapes will fail if there are any carriage return newline feeds, or whitespaces in this file.</strong>
+        </p>
+      <hr>
+
+      <h3>API</h3>
+        <code>GET /api/vetted/network_bro_intel/json/</code> - pull all vetted bro intel json objects
+          <br>
+        <code>GET /api/vetted/network_bro_intel/json/{id}</code> - pull a vetted bro intel json object
+          <br>
+        <code>GET /api/vetted/network_snort/json/</code> - pull all vetted snort json objects
+          <br>
+        <code>GET /api/vetted/network_snort/json/{id}</code> - pull a vetted snort json object
+          <br>
+        <code>GET /api/vetted/binary_yara/json/</code> - pull all vetted yara json objects
+          <br>
+        <code>GET /api/vetted/binary_yara/json/{id}</code> - pull a vetted yara json object
+      <hr>
+
+      <h3>RBAC</h3>
+        <p>
+          - admins have full access, users are limited with detection object, user management and feed source controls. 
+        </p>
+
+      <hr>
+
+      <h3>Working on...</h3>
+        <p>
+          - more research modules
+        </p>         
+        <p>
+          - task queue (redis, celery)
+        </p>
+        <p>
+          - simplify install
+        </p>
+
+    </div>
+{% endblock %}
