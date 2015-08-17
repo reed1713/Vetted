@@ -124,7 +124,7 @@ def jsondl(source_id):
     for json_d in NBI_ids:
         if json_d.type_hash == hash_id:
             ct = cleantags(json_d.tags)
-            fn = json_d.localfile + '.json'
+            fn = json_d.source + '.json'
             jtime = timeconvert(json_d.created_date)
 
             data = {
@@ -144,7 +144,7 @@ def jsondl(source_id):
     for json_d in NS_ids:
         if json_d.type_hash == hash_id:
             ct = cleantags(json_d.tags)
-            fn = json_d.localfile + '.json'
+            fn = json_d.source + '.json'
             jtime = timeconvert(json_d.created_date)
 
             data = {
@@ -164,7 +164,7 @@ def jsondl(source_id):
     for json_d in BY_ids:
         if json_d.type_hash == hash_id:
             ct = cleantags(json_d.tags)
-            fn = json_d.localfile + '.json'
+            fn = json_d.source + '.json'
             jtime = timeconvert(json_d.created_date)
 
             data = {

@@ -334,6 +334,7 @@ def manual_NBI():
     if request.method == 'POST':
         cleansourcename = cleanUrl(form.source.data)
         indicators = tolistofdicts(form.newlinei.data)
+        filename = downloadedFilename(cleansourcename)
         if indicators == None:
             indicators = []
         result = Network_Bro_Intel_dt(
@@ -345,6 +346,7 @@ def manual_NBI():
             created_by = session['name'],
             tags = [],
             notes = form.notes.data,
+            localcsvfile = filename + '.csv'
             )
         result.str_tags = form.strtags.data
         try:
@@ -374,6 +376,7 @@ def manual_NS():
     if request.method == 'POST':
         cleansourcename = cleanUrl(form.source.data)
         indicators = snort_sig_to_list(form.newlinei.data)
+        filename = downloadedFilename(cleansourcename)
         if indicators == None:
             indicators = []
         result = Network_Snort_dt(
@@ -385,6 +388,7 @@ def manual_NS():
             created_by = session['name'],
             tags = [],
             notes = form.notes.data,
+            localcsvfile = filename + '.csv'
             )
         result.str_tags = form.strtags.data
         try:
@@ -414,6 +418,7 @@ def manual_BY():
     if request.method == 'POST':
         cleansourcename = cleanUrl(form.source.data)
         indicators = yara_sig_to_list(form.newlinei.data)
+        filename = downloadedFilename(cleansourcename)
         if indicators == None:
             indicators = []
         result = Binary_Yara_dt(
@@ -425,6 +430,7 @@ def manual_BY():
             created_by = session['name'],
             tags = [],
             notes = form.notes.data,
+            localcsvfile = filename + '.csv'
             )
         result.str_tags = form.strtags.data
         try:

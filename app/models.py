@@ -255,8 +255,9 @@ class Network_Snort_dt(db.Model):
     def _set_i(self, value):
 
         split_sigs = re.split(r'\r\n\r\n', value)
-        addback = [x + '\r\n\r\n' for x in split_sigs[:-1]]
-        final = addback + split_sigs[-1:]
+        addback = [x.strip() + '\r\n\r\n' for x in split_sigs[:-1]]
+        addbackagain = [x.strip() for x in split_sigs[-1:]]
+        final = addback + addbackagain
 
         out = json.dumps(final)
         newout = json.loads(out)
@@ -376,8 +377,9 @@ class Binary_Yara_dt(db.Model):
     def _set_i(self, value):
 
         split_sigs = re.split(r'\r\n\}\r\n\r\n', value)
-        addback = [x + '\r\n}\r\n\r\n' for x in split_sigs[:-1]]
-        final = addback + split_sigs[-1:]
+        addback = [x.strip() + '\r\n}\r\n\r\n' for x in split_sigs[:-1]]
+        addbackagain = [x.strip() for x in split_sigs[-1:]]
+        final = addback + addbackagain
 
         out = json.dumps(final)
         newout = json.loads(out)
