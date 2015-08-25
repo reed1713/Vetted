@@ -11,7 +11,7 @@ from sys import exit
 
 # vars are for testing, replace with your own
 VETTED_SERVER = 'http://127.0.0.1:5000'
-API_KEY = '8a03b155f3364c818a1602d2bb7a3316'
+API_KEY = '8e662aee78554f579a24af53ad9b1856'
 PATH_TO_BROCTL = '/usr/local/bro/bin/broctl'
 
 # log time vars

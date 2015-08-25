@@ -8,7 +8,7 @@
 #the entire virtualenv process could be skipped if you dont plan running in a virtual environment.
 
 #Create the file 
-/etc/apt/sources.list.d/pgdg.list 
+touch /etc/apt/sources.list.d/pgdg.list 
 
 #and add a line for the repository
 
@@ -29,15 +29,15 @@ $ sudo easy_install pip
 
 #create your virtual environment
 
-$ virtualenv ~/Desktop/Projects/Vetted_project
+$ virtualenv ~/Desktop/Devel/vetted
 
 $ sudo pip install virtualenvwrapper 
 
 #add the following to the end of your .bashrc profile file
-export WORKON_HOME=~/Desktop/Projects/
+export WORKON_HOME=~/Desktop/Devel/
 source /usr/local/bin/virtualenvwrapper.sh
 
-#move the Vetted dir containing the app into the virutal environment Vetted_project dir
+#move the Vetted dir containing the app into the virtual environment vetted dir
 
 $ sudo su - postgres
 
@@ -51,45 +51,53 @@ template1=# \q
 
 $ exit
 
-$ workon Vetted_project
+$ workon vetted
 
 # should be in the vetted virtual environment now
 
 $ vim $VIRTUAL_ENV/bin/postactivate
 
-#add and edit accordingly these lines to the postactivate file
-cd ~/Desktop/Projects/Vetted_project/Vetted/
+#add and edit accordingly these lines to the postactivate file if using virtualenv, otherwise add to .bashrc minus the directory change.
+cd ~/Desktop/Devel/vetted/Vetted/
 export DATABASE_URL="postgresql://vetted:Vetted12pw@localhost/vetted_db"
 export APP_SETTINGS="config.DevelopmentConfig"
-export UPLOAD_FOLDER="/home/rreed/Desktop/Projects/Vetted_project/Vetted/app/documents/"
-export SECRET_KEY="this-really-needs-to-be-changed"
+export UPLOAD_FOLDER="/home/rreed/Desktop/Devel/vetted/Vetted/app/documents/"
+export SECRET_KEY="change-me"
 
-$ cd ~/Desktop/Projects/Vetted_project/Vetted/
+$ cd ~/Desktop/Devel/vetted/Vetted/
 
 $ pip install -r requirements.txt
 
 $ deactivate
 
-$ workon Vetted_project
+$ workon vetted
 
 $ python run.py db init
 
-# replace the Vetted_project/lib/python2.7/site-packages/flask_bootstrap/templates/wtf.html with the app/templates/wtf.html template
+$ python run.py db migrate
 
-#if you plan to change the app model
+$ python run.py db upgrade
 
-	$ python run.py db migrate
-
-	$ python run.py db upgrade
+# replace the vetted/lib/python2.7/site-packages/flask_bootstrap/templates/bootstrap/wtf.html with the app/templates/wtf.html template
 
 #connect to db with pgadmin and create admin user with role 'admin'
 #to create admin password see the below python console code, once you 
 #have the salt, paste that into the password column and save the record.
+#create an api key and paste into api_key column
 
 >>> import bcrypt
 >>> salt = bcrypt.gensalt()
 >>> hash = bcrypt.hashpw('admin_password', salt)
 >>> print hash
+
+>>> import uuid
+>>> apikey = str(uuid.uuid4()).replace("-", "")
+>>> print apikey
+
+# run the server, navigate to localhost:5000 in your browser.
+
+$ python run.py runserver
+
 
 ###EXTRAS###
 

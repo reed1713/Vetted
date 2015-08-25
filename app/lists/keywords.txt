@@ -35,7 +35,7 @@ hikit
 ##THREAT_GROUPS##
 Axiom group
 Ajax Security Team
-apt ?[0-9]{1,2}
+apt[0-9]{1,2}
 ##REGIONS##
 hong kong
 Tibet

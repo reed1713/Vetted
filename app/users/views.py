@@ -113,7 +113,7 @@ def register():
                 return redirect(url_for('users.register'))
             except IntegrityError:
                 db.session.rollback()
-                error = 'Sorry that username and/or email error already exist.'
+                error = 'Sorry that username and/or email already exists.'
                 return render_template('register.html', 
                     form=form, 
                     error=error, 
