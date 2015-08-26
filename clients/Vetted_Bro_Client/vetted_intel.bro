@@ -1,7 +1,7 @@
 @load base/frameworks/intel
-@load frameworks/intel/seen
-@load frameworks/intel/do_notice
+@load policy/frameworks/intel/seen
+@load policy/frameworks/intel/do_notice
 
 redef Intel::read_files += {
-	"/path_to_your_vetted_dat_file/vetted_intel.dat"
+	"/opt/Vetted/clients/Vetted_Bro_Client/vetted_intel.dat"
 };

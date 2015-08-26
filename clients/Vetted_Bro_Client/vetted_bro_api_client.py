@@ -1,6 +1,10 @@
 # vetted api client for bro intel
 # author reed3276@gmail.com
 
+#local.bro example
+#load vetted intel
+#@load /opt/Vetted/clients/Vetted_Bro_Client
+
 import requests
 import json
 from collections import defaultdict
@@ -10,9 +14,9 @@ import datetime, time
 from sys import exit
 
 # vars are for testing, replace with your own
-VETTED_SERVER = 'http://127.0.0.1:5000'
+VETTED_SERVER = 'http://192.168.7.112:5000'
 API_KEY = '8e662aee78554f579a24af53ad9b1856'
-PATH_TO_BROCTL = '/usr/local/bro/bin/broctl'
+PATH_TO_BROCTL = '/opt/bro/bin/broctl'
 
 # log time vars
 ts = time.time()
@@ -79,18 +83,18 @@ def write_to_file():
 	supported_types = ['DOMAIN', 'ADDR', 'URL', 'FILE_NAME', 'CERT_HASH', 'EMAIL', 'FILE_HASH']
 
 	with open('vetted_intel.dat', 'w') as intelfile:	
-		intelfile.write('#fields	indicator	indicator_type	meta.source	meta.desc	meta.url	meta.do_notice' + '\n')
+		intelfile.write('#fields	indicator	indicator_type	meta.source' + '\n')
 		for c in cleanlist:
 			if c[1] not in supported_types:
 				with open('vetted_client.log', 'a') as logfile:
 					logfile.write(st + ": unsupported intel type: " + c[1] + '\n')
 			else:
-				sources = str([str(x) for x in c[2]])
+				sources = str([str(x) for x in c[2]]).replace(',','')
 				combinetags = set(str(r) for v in c[3] for r in v)
-				tags = str([str(x) for x in combinetags])
+				tags = str([str(x) for x in combinetags]).replace(',','')
 				indicator_type = c[1]
 				indicator = c[0]
-				intelfile.write(indicator + '\t' + 'Intel::'+ indicator_type + '\t' + 'vetted' + '\t' + tags + '\t' + sources + '\t' + 'F' +'\n')
+				intelfile.write(indicator + '\t' + 'Intel::'+ indicator_type + '\t' + 'vetted-' + tags + '-' + sources + '\n')
 
 def main():
 
