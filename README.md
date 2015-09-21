@@ -30,7 +30,7 @@ Supported detection types: 'Bro Intel', 'Snort', 'Yara'.
 
 ### API clients
 
-As of now, only have the one for the Bro Intel framework.
+As of now, I only have the Bro Intel api client working.
 
 ### Installing
 
@@ -42,6 +42,7 @@ Getting this spun up is a manual process. For more info check out the INSTALL do
 
 - research module has an rss and atom feed parser. 
 
+- RBAC: admin, user
 
 ### Screenshots
 
@@ -53,9 +54,10 @@ Getting this spun up is a manual process. For more info check out the INSTALL do
 ![editintel](./screens/editintel.png)
 
 ### To do:
-- task queue
+- add "memory - yara" detection object
+- snort api client, yara bin/mem api client
 - more research modules
-- snort api client 
+- task queue
 - code has a lot of stank... i'll get around to that one day
 - easy install script
 

@@ -220,6 +220,23 @@ def api_snort_vetted(dt_id):
             code = 404
         return make_response(jsonify(result), code)
 
+# @app.route('/api/vetted/network_snort/json/<string:source_string>', methods='POST')
+# @apikey_required
+# def api_snort_vetted_post(source_string):
+#     if request.method == 'POST':
+#         result = db.session.query(Network_Snort_dt).filter_by(source=source_string).first()
+#         print result
+#         if result:
+#             result = Network_Snort_dt(
+#             snort_indicators=result.snort_indicators,
+#             )
+#             db.session.commit()
+#             code = 200
+#         else:
+#             result = {"sorry": "Element does not exist"}
+#             code = 404
+#         return make_response(jsonify(result), code)
+
     ###################
     ### Binary Yara ###
     ###################
