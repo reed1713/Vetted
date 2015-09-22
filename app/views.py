@@ -9,7 +9,7 @@ from app.models import *
 from flask import flash, redirect, session, url_for, \
     render_template, request, jsonify, make_response, abort
 from functools import wraps
-
+from app.models import Network_Snort_dt
 ##########################
 #### helper functions ####
 ##########################
@@ -141,6 +141,7 @@ def api_all_bro_intel_vetted():
                     'created_date' : result.created_date,
                     'tags' : ct,
                     'notes' : result.notes,
+                    'type_hash' : result.type_hash,
                         }
                 json_results.append(data)
                 code = 200
@@ -163,6 +164,7 @@ def api_bro_intel_vetted(dt_id):
                 'created_date' : result.created_date,
                 'tags' : ct,
                 'notes' : result.notes,
+                'type_hash' : result.type_hash,
             }
             code = 200
         else:
@@ -191,6 +193,7 @@ def api_all_snort_vetted():
                     'created_date' : result.created_date,
                     'tags' : ct,
                     'notes' : result.notes,
+                    'type_hash' : result.type_hash,
                         }
                 json_results.append(data)
                 code = 200
@@ -213,12 +216,30 @@ def api_snort_vetted(dt_id):
                 'created_date' : result.created_date,
                 'tags' : ct,
                 'notes' : result.notes,
+                'type_hash' : result.type_hash,
             }
             code = 200
         else:
             result = {"sorry": "Element does not exist"}
             code = 404
         return make_response(jsonify(result), code)
+
+# POST updated snort indicators
+@app.route('/api/vetted/network_snort/json/<string:type_hash>', methods=['POST'])
+@apikey_required
+def api_snort_vetted_post(type_hash):
+    if request.method == 'POST':
+        result = db.session.query(Network_Snort_dt).filter_by(type_hash=type_hash).first()
+        data = request.data
+        indicators = json.loads(data)
+        if result:
+            d_obj = Network_Snort_dt.query.get(result.id)
+            d_obj.snort_indicators = indicators['indicators']
+            db.session.commit()
+            return make_response(str(200))
+        else:
+            abort(401)
+        
 
     ###################
     ### Binary Yara ###
@@ -241,6 +262,7 @@ def api_all_yara_vetted():
                     'created_date' : result.created_date,
                     'tags' : ct,
                     'notes' : result.notes,
+                    'type_hash' : result.type_hash,
                         }
                 json_results.append(data)
                 code = 200
@@ -263,6 +285,7 @@ def api_yara_vetted(dt_id):
                 'created_date' : result.created_date,
                 'tags' : ct,
                 'notes' : result.notes,
+                'type_hash' : result.type_hash,
             }
             code = 200
         else:
