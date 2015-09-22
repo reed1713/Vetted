@@ -28,9 +28,29 @@ def download_vetted_json():
 	    out = r.json()
 	    return out
 	else:
-	    with open('vetted_client.log', 'a') as logfile:
+	    with open('vetted_snort_client.log', 'a') as logfile:
 	    	logfile.write(st + ": failed to connect to " + VETTED_SERVER + " check api key or server address" + "\n")
 
+def post_snort_sig(hash_type):
+
+	url = VETTED_SERVER + '/api/vetted/network_snort/json/' + hash_type
+	payload = {'api_key' : API_KEY }
+
+	indicators = {
+	"indicators": ["alert tcp any any -> $HOME_NET 7789 (msg: \"test\"; reference: url,http://holisticinfosec.blogspot.com/2011/12/choose-2011-toolsmith-tool-of-year.html; content: \"toolsmith\"; flow:to_server; nocase; rev:1;)"
+      ]
+      }
+	r = requests.post(url, params=payload, data=json.dumps(indicators))
+	if r.status_code == 200:
+		with open('vetted_snort_client.log', 'a') as logfile:
+			logfile.write(st + ": successfully POSTed snort signatures to the vetted server" + "\n")
+			return 'SUCCESS'
+	else:
+	    with open('vetted_snort_client.log', 'a') as logfile:
+	    	logfile.write(st + ": failed to connect to " + VETTED_SERVER + " check api key or server address" + "\n")
+	    	return 'FAIL'
+
 if __name__ == '__main__':
-	out = download_vetted_json()
+	out = post_snort_sig('5f24504ae2defc0de1caa8d1301b1667')
+	#out = download_vetted_json()
 	print out
