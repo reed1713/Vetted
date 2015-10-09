@@ -14,13 +14,17 @@ import datetime, time
 from sys import exit
 
 # vars are for testing, replace with your own
-VETTED_SERVER = 'http://192.168.7.112:5000'
+VETTED_SERVER = 'http://192.168.7.115:5000'
 API_KEY = '8e662aee78554f579a24af53ad9b1856'
 PATH_TO_BROCTL = '/opt/bro/bin/broctl'
+PATH_TO_DIR = r'/opt/Vetted/clients/Vetted_Bro_Client'
 
 # log time vars
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+# change into dir, so cron will log correctly.
+os.chdir(PATH_TO_DIR)
 
 def download_vetted_json():
 
@@ -110,7 +114,6 @@ def main():
 			logfile.write(st + ": BRO RESTART FAILED: broctl bin not found in specified path" + "\n")
 
 if __name__ == '__main__':
-
 	if not os.geteuid() == 0:
 		with open('vetted_client.log', 'a') as logfile:
 			logfile.write(st + ": Needs to be run as root" + "\n")
