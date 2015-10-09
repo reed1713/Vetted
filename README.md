@@ -20,7 +20,8 @@ The idea behind this project is to create a simple indicator management app that
   "source": "", 
   "tags": [
     ""
-  ]
+  ],
+  "type_hash": ""
 }
 ```
 
