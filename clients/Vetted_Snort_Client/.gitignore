@@ -1,1 +1,5 @@
 vetted_snort_client.log
+reset_db.py
+source_sid.db
+testrule.py
+*.pyc
