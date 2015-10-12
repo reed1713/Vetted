@@ -35,6 +35,27 @@ def admin(test):
             return redirect(url_for('welcome.welcome'))
     return wrap
 
+def apikey_admin(view):
+
+    '''
+    checks to see if the api key is associated with an admin role.
+    '''
+
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+
+        api_key = request.args.get('api_key', '')
+        
+        if api_key:
+            key = User.query.filter_by(api_key=api_key,role='admin').first()
+            if key:
+                return view(*args, **kwargs)
+        else:
+            abort(401)
+    return wrapped_view
+
+
+
 def apikey_required(view):
 
     '''
@@ -142,6 +163,7 @@ def api_all_bro_intel_vetted():
                     'tags' : ct,
                     'notes' : result.notes,
                     'type_hash' : result.type_hash,
+                    'priority' : result.priority,
                         }
                 json_results.append(data)
                 code = 200
@@ -165,6 +187,7 @@ def api_bro_intel_vetted(dt_id):
                 'tags' : ct,
                 'notes' : result.notes,
                 'type_hash' : result.type_hash,
+                'priority' : result.priority,
             }
             code = 200
         else:
@@ -194,6 +217,7 @@ def api_all_snort_vetted():
                     'tags' : ct,
                     'notes' : result.notes,
                     'type_hash' : result.type_hash,
+                    'priority' : result.priority,
                         }
                 json_results.append(data)
                 code = 200
@@ -217,6 +241,7 @@ def api_snort_vetted(dt_id):
                 'tags' : ct,
                 'notes' : result.notes,
                 'type_hash' : result.type_hash,
+                'priority' : result.priority,
             }
             code = 200
         else:
@@ -226,7 +251,7 @@ def api_snort_vetted(dt_id):
 
 # POST updated snort indicators
 @app.route('/api/vetted/network_snort/json/<string:type_hash>', methods=['POST'])
-@apikey_required
+@apikey_admin
 def api_snort_vetted_post(type_hash):
     if request.method == 'POST':
         result = db.session.query(Network_Snort_dt).filter_by(type_hash=type_hash).first()
@@ -263,6 +288,7 @@ def api_all_yara_vetted():
                     'tags' : ct,
                     'notes' : result.notes,
                     'type_hash' : result.type_hash,
+                    'priority' : result.priority,
                         }
                 json_results.append(data)
                 code = 200
@@ -286,6 +312,7 @@ def api_yara_vetted(dt_id):
                 'tags' : ct,
                 'notes' : result.notes,
                 'type_hash' : result.type_hash,
+                'priority' : result.priority,
             }
             code = 200
         else:
