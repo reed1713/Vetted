@@ -3,30 +3,27 @@
 
 import requests
 import json
-from collections import defaultdict
 import subprocess
-import os.path
-import datetime, time
-from sys import exit
+import os
+import datetime
+import time
+import sys
 import rule
+import re
+import config
+from collections import defaultdict
 
-# vars are for testing, replace with your own
-VETTED_SERVER = 'http://192.168.7.115:5000'
-API_KEY = '8e662aee78554f579a24af53ad9b1856'
-PATH_TO_RULES_FILE = '/etc/nsm/rules/local.rules'
-PATH_TO_SID_MAP_FILE = '/etc/nsm/rules/sid-msg.map'
-RULE_RESTART = 'rule-update'
-SID_START = 50000000
-
-# log time vars
+# log time
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
+# change into dir, so cron will log correctly.
+os.chdir(config.PATH_TO_DIR)
 
 def download_vetted_json():
 
-	url = VETTED_SERVER + '/api/vetted/network_snort/json/'
-	payload = {'api_key' : API_KEY}
+	url = config.VETTED_SERVER + '/api/vetted/network_snort/json/'
+	payload = {'api_key' : config.API_KEY}
 	r = requests.get(url, params=payload)
 
 	if r.status_code == 200:
@@ -34,16 +31,16 @@ def download_vetted_json():
 	    return out
 	else:
 	    with open('vetted_snort_client.log', 'a') as logfile:
-	    	logfile.write(st + ": failed to connect to " + VETTED_SERVER + " check api key or server address" + "\n")
+	    	logfile.write(st + ": failed to connect to " + config.VETTED_SERVER + " check api key or server address" + "\n")
 
-def post_vetted_sig(hash_type):
+def post_vetted_sig(hash_type, indic):
 
-	url = VETTED_SERVER + '/api/vetted/network_snort/json/' + hash_type
-	payload = {'api_key' : API_KEY }
+	url = config.VETTED_SERVER + '/api/vetted/network_snort/json/' + hash_type
+	payload = {'api_key' : config.API_KEY }
+
 
 	indicators = {
-	"indicators": ["alert tcp any any -> $HOME_NET 7789 (msg: \"test\"; reference: url,http://holisticinfosec.blogspot.com/2011/12/choose-2011-toolsmith-tool-of-year.html; content: \"toolsmith\"; flow:to_server; nocase; rev:1;)"
-      ]
+	"indicators": indic
     }
 	r = requests.post(url, params=payload, data=json.dumps(indicators))
 	if r.status_code == 200:
@@ -52,29 +49,74 @@ def post_vetted_sig(hash_type):
 			return 'SUCCESS'
 	else:
 	    with open('vetted_snort_client.log', 'a') as logfile:
-	    	logfile.write(st + ": failed to connect to " + VETTED_SERVER + " check api key or server address" + "\n")
+	    	logfile.write(st + ": failed to connect to " + config.VETTED_SERVER + " check api key or server address" + "\n")
 	    	return 'FAIL'
 
 def json_to_listofdicts():
 
+	'''
+	parse out rule, if rule doesnt have sid then assign sid. POST updated rule back to 
+	vetted server. write latest sid to config. return dict of rules.
+	'''
+
 	out = download_vetted_json()
-	networklist = []
+	writesigs = []
+	dd = defaultdict(list)
 	if out == None:
 	    with open('vetted_snort_client.log', 'a') as logfile:
-	    	logfile.write(st + ": No signatures to download." + "\n")
+	    	logfile.write(st + ": no signatures to download." + "\n")
 	else:
+		listit = []
 		for o in out['vetted']:
 			sig = o['indicators']
 			for s in sig:
-				s.replace('\r\n','')
 				parsed_rule = rule.parse(s)
-				networkdumps = json.dumps(parsed_rule)
-				networkloads = json.loads(networkdumps)
-				networkloads['tags'] = o['tags']
-				networkloads['source'] = o['source']
-				networkloads['priority'] = o['priority']
-				networklist.append(networkloads)
-	return networklist
+				if parsed_rule != None:
+					if parsed_rule.sid == None:
+						parsed_rule.sid = str(config.SID_START)
+						rule_with_sid = rule.parse(parsed_rule.raw[:-1] + ' sid: ' + parsed_rule.sid + ';)')
+						with open('vetted_snort_client.log', 'a') as logfile:
+							logfile.write(st + ": assigned sid " + str(config.SID_START) + ' to rule \"' + parsed_rule.msg + '\"' + "\n")
+						config.SID_START = int(config.SID_START) + 1
+						parsed_rule.raw = rule_with_sid
+					else:
+						pass
+
+					rulesiddict = {o['type_hash'] : str(parsed_rule.raw)}
+					for key, value in rulesiddict.iteritems():
+						dd[key].append(value)
+					for d in dd.iteritems():
+						hash_type = d[0]
+						addnewline = [x.replace(';)', ';)\r\n\r\n') for x in d[1][:-1]]
+						final = addnewline + d[1][-1:]
+						out = json.dumps(final)
+						indict = json.loads(out)
+						post_vetted_sig(hash_type, indict)
+
+					with open(config.PATH_TO_RULES_FILE, 'r+') as f:
+						print parsed_rule.raw
+						print type(parsed_rule.raw)
+						#writesigs.append(parsed_rule.raw)
+						#final = '\r\n'.join(writesigs)
+						#f.write(final)
+
+					# writes next sid to config file
+					with open('config.py', 'r+') as f:
+						text = f.read()
+						out = re.sub('SID_START = .*', 'SID_START = ' + str(config.SID_START), text)
+						f.seek(0)
+						f.write(out)
+
+
+	#return the dict of values for sid msg file parsing
+	# 	print parsed_rule
+	# 	networkdumps = json.dumps(parsed_rule)
+	# 	networkloads = json.loads(networkdumps)
+	# 	networkloads['tags'] = o['tags']
+	# 	networkloads['source'] = o['source']
+	# 	networkloads['priority'] = o['priority']
+	# 	networklist.append(networkloads)
+	# print networklist
 		
 def sid_rulename_source_tags_dict():
 	'''
@@ -82,24 +124,31 @@ def sid_rulename_source_tags_dict():
 	this will be used to write to the sid-msg.map file
 	'''
 	pass
-def check_for_sid():
-	'''
-	check if signature has sid, if not assign sid and log import
-	'''
-	pass
 def overwrite_sidmap_entries():
 	'''
 	find the vetted entries in the sid-msg.map file and overwrite them with the newly
-	downloaded entries. if ### Vetted ### not in sid file, create start and end markers.
+	downloaded entries.
 	'''
-	pass
-def get_most_recent_sid():
-	'''
-	locates the most recent sid to increment correctly
-	'''
-	pass
+	filename = 'testsid.map'
+	bar = '### Vetted ###\r\n5000000 || test || source,googleprojectzero.blogspot.com/2015/08/windows-10hh-symbolic-link-mitigations.html || tags, test test1 test3\r\n5000001 || blah || source,googleprojectzero.blogspot.com/2015/08/windows-10hh-symbolic-link-mitigations.html || tags, test test1 test3\r\n### Vetted_end ###'
+
+	with open(filename, 'r+') as f:
+		text = f.read()
+		test = re.search('### Vetted ###', text)
+		if test != None:
+			text = re.sub('### Vetted ###.*### Vetted_end ###', bar, text, flags=re.DOTALL)
+			f.seek(0)
+			f.write(text)
+			f.truncate()
+			with open('vetted_snort_client.log', 'a') as logfile:
+				logfile.write(st + ": successfully overwrote entries in the sid-msg.map file" + "\n")
+		else:
+			f.write(bar)
+			with open('vetted_snort_client.log', 'a') as logfile:
+				logfile.write(st + ": successfully wrote entries to the sid-msg.map file" + "\n")
 
 if __name__ == '__main__':
 	#out = post_vetted_sig('5f24504ae2defc0de1caa8d1301b1667')
 	out = json_to_listofdicts()
-	print out
+	#print out
+	#overwrite_sidmap_entries()

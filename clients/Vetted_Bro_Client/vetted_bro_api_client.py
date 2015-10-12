@@ -43,7 +43,6 @@ def dedupe_indicators():
 
 	vettedintel = download_vetted_json()
 	test = vettedintel.itervalues().next()
-	vettedlist = []
 	dd = defaultdict(list)
 
 	for t in test:
