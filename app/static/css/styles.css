@@ -33,7 +33,6 @@ table {
 #status {
 	width: 110px;
 }
-
 #notes {
 	height: 150px
 }
@@ -56,12 +55,10 @@ table {
 	width: 100px;
 }
 #whitelist_field{
-	height: 400px;
-	width: 400px;
+	height: 500px;
 }
 #keywordlist_field{
-	height: 400px;
-	width: 400px;
+	height: 500px;
 }
 #sourceconfidence{
 	width: 110px;
