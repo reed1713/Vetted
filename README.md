@@ -13,10 +13,11 @@ The idea behind this project is to create a simple indicator management app that
   "created_date": "", 
   "indicators": [
     {
-      "": ""
+    ""
     }, 
   ],
-  "notes": "", 
+  "notes": "",
+  "priority": "", 
   "source": "", 
   "tags": [
     ""
@@ -31,7 +32,7 @@ Supported detection types: 'Bro Intel', 'Snort', 'Yara'.
 
 ### API clients
 
-As of now, I only have the Bro Intel api client working.
+Bro Intel, Snort. (Both tested and working on Security Onion)
 
 ### Installing
 
@@ -56,12 +57,14 @@ Getting this spun up is a manual process. For more info check out the INSTALL do
 
 ### To do:
 - add "memory - yara" detection object
-- snort api client, yara bin/mem api client
+- yara bin/mem api client
 - more research modules
 - task queue
-- code has a lot of stank... i'll get around to that one day
 - easy install script
 
 
-any questions or feedback, feel free to send me an email reed3276@gmail.com
+feel free to contact me if you have any questions or feedback.
+
+reed3276@gmail.com
+@reed1713
 
