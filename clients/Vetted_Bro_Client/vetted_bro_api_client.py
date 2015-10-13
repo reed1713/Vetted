@@ -10,26 +10,22 @@ import json
 from collections import defaultdict
 import subprocess
 import os.path
-import datetime, time
+import datetime
+import time
 from sys import exit
-
-# vars are for testing, replace with your own
-VETTED_SERVER = 'http://192.168.7.115:5000'
-API_KEY = '8e662aee78554f579a24af53ad9b1856'
-PATH_TO_BROCTL = '/opt/bro/bin/broctl'
-PATH_TO_DIR = r'/opt/Vetted/clients/Vetted_Bro_Client'
+import config
 
 # log time vars
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 # change into dir, so cron will log correctly.
-os.chdir(PATH_TO_DIR)
+os.chdir(config.PATH_TO_DIR)
 
 def download_vetted_json():
 
-	url = VETTED_SERVER + '/api/vetted/network_bro_intel/json/'
-	payload = {'api_key' : API_KEY}
+	url = config.VETTED_SERVER + '/api/vetted/network_bro_intel/json/'
+	payload = {'api_key' : config.API_KEY}
 	r = requests.get(url, params=payload)
 
 	if r.status_code == 200:
@@ -37,7 +33,7 @@ def download_vetted_json():
 	    return out
 	else:
 	    with open('vetted_client.log', 'a') as logfile:
-	    	logfile.write(st + ": failed to connect to " + VETTED_SERVER + " check api key or server address" + "\n")
+	    	logfile.write(st + ": failed to connect to " + config.VETTED_SERVER + " check api key or server address" + "\n")
 
 def dedupe_indicators():
 
@@ -79,7 +75,8 @@ def write_to_file():
 
 	'''
 	if not a supported bro intel type, its disregarded and writes to log.
-	then writes vetted intel to file. removes unicode and dedupes.
+	then writes vetted intel to file. 
+	removes unicode and dedupes.
 	'''
 	
 	cleanlist = prepare_for_file()
@@ -103,19 +100,14 @@ def main():
 
 	write_to_file()
 
-	if os.path.isfile(PATH_TO_BROCTL):
+	if os.path.isfile(config.PATH_TO_BROCTL):
 		FNULL = open(os.devnull, 'w')
-		subprocess.call([PATH_TO_BROCTL, 'restart'], stdout=FNULL, stderr=subprocess.STDOUT)
+		subprocess.call([config.PATH_TO_BROCTL, 'restart'], stdout=FNULL, stderr=subprocess.STDOUT)
 		with open('vetted_client.log', 'a') as logfile:
 			logfile.write(st + ": successfully downloaded bro intel" + "\n")
 	else:
 		with open('vetted_client.log', 'a') as logfile:
-			logfile.write(st + ": BRO RESTART FAILED: broctl bin not found in specified path" + "\n")
+			logfile.write(st + ": broctl bin not found in specified path" + "\n")
 
 if __name__ == '__main__':
-	if not os.geteuid() == 0:
-		with open('vetted_client.log', 'a') as logfile:
-			logfile.write(st + ": Needs to be run as root" + "\n")
-			exit()
-   	else:
-		main()
+	main()
