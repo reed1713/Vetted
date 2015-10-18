@@ -13,7 +13,6 @@ from app import db, bcrypt
 from app.views import login_required, admin
 from app.models import User
 
-
 ################
 #### config ####
 ################

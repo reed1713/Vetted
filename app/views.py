@@ -10,6 +10,7 @@ from flask import flash, redirect, session, url_for, \
     render_template, request, jsonify, make_response, abort
 from functools import wraps
 from app.models import Network_Snort_dt
+
 ##########################
 #### helper functions ####
 ##########################

@@ -333,7 +333,7 @@ class Binary_Yara_dt(db.Model):
     ### helper properties ###
     #########################
 
-    network_yara_tags = association_proxy('tags', 'tag_table')
+    binary_yara_tags = association_proxy('tags', 'tag_table')
 
     def _find_or_create_tag(self, tag):
 
@@ -388,6 +388,130 @@ class Binary_Yara_dt(db.Model):
     newline_indicators = property(_get_i, 
                                   _set_i, 
                                   "Property to clean form output")
+
+
+class Memory_Yara_dt(db.Model):
+
+    __tablename__ = 'M_yara'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type_hash = db.Column(db.String, unique=True)
+    source = db.Column(db.String)
+    yara_indicators = db.Column(JSON)
+    d_type = db.Column(db.String)
+    tags = db.relationship('Tag', secondary=lambda: Myara_tags_relation_table)
+    notes = db.Column(db.String)
+    localfile = db.Column(db.String)
+    localtxtfile = db.Column(db.String)
+    localcsvfile = db.Column(db.String)
+    created_date = db.Column(db.DateTime(), default=datetime.utcnow)
+    created_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
+    in_review_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
+    vetted_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
+    stale_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
+    priority = db.Column(db.String, default='medium')
+    status = db.Column(db.String, default='open')
+
+    def __init__(self,
+        type_hash = None,
+        source = None, 
+        yara_indicators = None,
+        d_type = 'Memory - Yara',
+        tags = None,
+        notes = None,
+        localcsvfile = None,
+        localtxtfile = None,
+        localfile = None,
+        created_date = None,
+        priority = None, 
+        status = None,
+        created_by = None, 
+        in_review_by = None,
+        vetted_by = None,
+        stale_by = None,
+        ):
+
+        self.type_hash = type_hash
+        self.source = source
+        self.yara_indicators = yara_indicators
+        self.d_type = d_type
+        self.tags = tags
+        self.notes = notes
+        self.localfile = localfile
+        self.localtxtfile = localtxtfile
+        self.localcsvfile = localcsvfile
+        self.created_date = created_date
+        self.priority = priority
+        self.status = status
+        self.created_by = created_by
+        self.in_review_by = in_review_by
+        self.vetted_by = vetted_by
+        self.stale_by = stale_by
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    #########################
+    ### helper properties ###
+    #########################
+
+    memory_yara_tags = association_proxy('tags', 'tag_table')
+
+    def _find_or_create_tag(self, tag):
+
+        '''
+        https://stackoverflow.com/questions/2310153/inserting-data-in-many-to-many-relationship-in-sqlalchemy
+        '''
+
+        q = Tag.query.filter_by(tag_string=tag)
+        t = q.first()
+
+        if not(t):
+            t = Tag(tag)
+        return t
+
+    def _get_tags(self):
+        return self.tags
+
+    def _set_tags(self, value):
+
+        while self.tags:
+            del self.tags[0]
+
+        if type(value) == unicode:   
+            lvalue = value.split(',')
+        else:
+            lvalue = value
+
+        for tag in lvalue:
+            lt = tag.lower()
+            ctag = lt.strip()
+            self.tags.append(self._find_or_create_tag(ctag))
+
+    str_tags = property(_get_tags,
+                        _set_tags,
+                        "Property str_tags is a simple wrapper for tags relation")
+
+    def _get_i(self):
+
+        return self.yara_indicators
+
+    def _set_i(self, value):
+
+        split_sigs = re.split(r'\r\n\}\r\n\r\n', value)
+        addback = [x.strip() + '\r\n}\r\n\r\n' for x in split_sigs[:-1]]
+        addbackagain = [x.strip() for x in split_sigs[-1:]]
+        final = addback + addbackagain
+
+        out = json.dumps(final)
+        newout = json.loads(out)
+        self.yara_indicators = newout
+
+    newline_indicators = property(_get_i, 
+                                  _set_i, 
+                                  "Property to clean form output")
+
+
 ##########
 ## Tags ##
 ##########
@@ -405,6 +529,11 @@ Nsnort_tags_relation_table = db.Table('N_snort_tags', db.Model.metadata,
 Byara_tags_relation_table = db.Table('B_yara_tags', db.Model.metadata,
     db.Column('tag_id', db.Integer, db.ForeignKey('tag_table.id', onupdate="CASCADE", ondelete="SET NULL")),
     db.Column('b_yara_id', db.Integer, db.ForeignKey('B_yara.id', onupdate="CASCADE", ondelete="SET NULL"))
+)
+
+Myara_tags_relation_table = db.Table('M_yara_tags', db.Model.metadata,
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag_table.id', onupdate="CASCADE", ondelete="SET NULL")),
+    db.Column('m_yara_id', db.Integer, db.ForeignKey('M_yara.id', onupdate="CASCADE", ondelete="SET NULL"))
 )
 
 class Tag(db.Model):

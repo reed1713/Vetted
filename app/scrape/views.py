@@ -9,11 +9,11 @@ from app.models import Network_Bro_Intel_dt, Network_Snort_dt, Binary_Yara_dt, T
 from werkzeug import secure_filename
 
 #local helper methods
-from Wpuller import cleanUrl, cleangetUrl, downloadedFilename, geturlResource
-from IOCextractor import iocExtractor
-from Igenerator import indicatorListofDicts
-from Tkeywords import match_keyword
-from Tconverter import texttoFile
+from scripts.Wpuller import cleanUrl, cleangetUrl, downloadedFilename, geturlResource
+from scripts.IOCextractor import iocExtractor
+from scripts.Igenerator import indicatorListofDicts
+from scripts.Tkeywords import match_keyword
+from scripts.Tconverter import texttoFile
 
 #python lib
 import os

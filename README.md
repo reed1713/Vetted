@@ -63,8 +63,8 @@ Getting this spun up is a manual process. For more info check out the INSTALL do
 - easy install script
 
 
-feel free to contact me if you have any questions or feedback.
+Feel free to contact me if you have any questions or feedback.
 
 reed3276@gmail.com
-@reed1713
 
+@reed1713

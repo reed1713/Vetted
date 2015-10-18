@@ -12,7 +12,7 @@ from app.views import login_required, admin
 from app.models import Feeds, Feed_source
 
 #local helper methods
-from Wpuller import checkfeed
+from scripts.Wpuller import checkfeed
 
 #python lib
 import feedparser
