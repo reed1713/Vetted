@@ -52,26 +52,25 @@ def json_to_listofdicts():
 
 	'''
 	parse out rule, if rule doesnt have sid then assign sid. 
-	POST updated rule back to vetted server. 
 	write latest sid to config. 
-	write rules to local.rules file.
 	return list of dictionaries.
 	'''
 
 	out = download_vetted_json()
-	dd = defaultdict(list)
-	writesigs = []
+
 	networklist = []
 
 	if out == None:
 	    with open('vetted_snort_client.log', 'a') as logfile:
 	    	logfile.write(st + ": no signatures to download." + "\n")
 	else:
+		
 		for o in out['vetted']:
 			sig = o['indicators']
 			for s in sig:
 				parsed_rule = rule.parse(s)
 				if parsed_rule != None:
+					posthash = None
 					if parsed_rule.sid == None:
 						parsed_rule.sid = str(config.SID_START)
 						rule_with_sid = rule.parse(parsed_rule.raw[:-1] + ' sid: ' + parsed_rule.sid + ';)')
@@ -79,30 +78,7 @@ def json_to_listofdicts():
 							logfile.write(st + ": assigned sid " + str(config.SID_START) + ' to rule \"' + parsed_rule.msg + '\"' + "\n")
 						config.SID_START = int(config.SID_START) + 1
 						parsed_rule.raw = rule_with_sid
-
-					# prep and send sigs to Vetted server
-					rulesiddict = {o['type_hash'] : str(parsed_rule.raw)}
-					for key, value in rulesiddict.iteritems():
-						dd[key].append(value)
-					for d in dd.iteritems():
-						hash_type = d[0]
-						addnewline = [x.replace(';)', ';)\r\n\r\n') for x in d[1][:-1]]
-						final = addnewline + d[1][-1:]
-						out = json.dumps(final)
-						indict = json.loads(out)
-						post_vetted_sig(hash_type, indict)
-
-					# write sigs to local.rules file
-					with open(config.PATH_TO_RULES_FILE, 'r+') as f:
-						if type(parsed_rule) == 'rule.Rule':
-							ruletype = unicode(parsed_rule.raw)
-						else:
-							ruletype = parsed_rule.raw
-						rulelist = str(ruletype)
-						writesigs.append(rulelist)
-						final = '\r\n\r\n'.join(writesigs)
-						f.write(final)
-						f.truncate()
+						posthash = o['type_hash']
 
 					# writes next sid to config file
 					with open('config.py', 'r+') as f:
@@ -114,12 +90,62 @@ def json_to_listofdicts():
 	# create dictionary with all the data needed for sid-msg.map file and return it
 					networkdumps = json.dumps(parsed_rule)
 					networkloads = json.loads(networkdumps)
+					networkloads['type_hash'] = o['type_hash']
 					networkloads['sid'] = parsed_rule.sid
 					networkloads['tags'] = o['tags']
 					networkloads['source'] = o['source']
 					networkloads['priority'] = o['priority']
+					networkloads['newsid'] = posthash
+					networkloads['raw'] = parsed_rule.raw
 					networklist.append(networkloads)
 	return networklist
+
+def write_updated_sigs(pr):
+
+	'''
+	write sigs to local.rules file
+	'''
+
+	writesigs = []
+
+	for p in pr:
+		with open(config.PATH_TO_RULES_FILE, 'r+') as f:
+			if type(pr) == 'rule.Rule':
+				ruletype = unicode(p['raw'])
+			else:
+				ruletype = p['raw']
+			rulelist = str(ruletype)
+			writesigs.append(rulelist)
+			final = '\r\n\r\n'.join(writesigs)
+			f.write(final)
+			f.truncate()
+
+def post_sigs_back(sigs):
+
+	'''
+	if no sid, prep and send sigs to Vetted server
+	'''
+
+	checklist = []
+	dd = defaultdict(list)
+
+	for s in sigs:
+		if s['newsid'] != None:
+			checklist.append(s['type_hash'])
+	if checklist:
+		for c in set(checklist):
+			for s in sigs:
+				if s['type_hash'] == c:
+					rulesdict = {str(s['type_hash']) : str(s['raw'])}
+					for key, value in rulesdict.iteritems():
+					 	dd[key].append(value)
+					for d in dd.iteritems():
+					 	hash_type = d[0]
+					 	addnewline = [x.replace(';)', ';)\r\n\r\n') for x in d[1][:-1]]
+					 	final = addnewline + d[1][-1:]
+					 	out = json.dumps(final)
+					 	indict = json.loads(out)
+						post_vetted_sig(hash_type, indict)
 		
 def overwrite_sidmap_entries():
 
@@ -128,6 +154,9 @@ def overwrite_sidmap_entries():
 	'''
 
 	out = json_to_listofdicts()
+	post_sigs_back(out)
+	write_updated_sigs(out)
+
 	list_of_sigmsgs = []
 
 	for o in out:

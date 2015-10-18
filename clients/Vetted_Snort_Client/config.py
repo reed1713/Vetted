@@ -4,4 +4,4 @@ PATH_TO_RULES_FILE = '/etc/nsm/rules/local.rules'
 PATH_TO_SID_MAP_FILE = '/etc/nsm/rules/sid-msg.map'
 PATH_TO_RULE_UPDATE = '/usr/bin/rule-update'
 PATH_TO_DIR = '/opt/Vetted/clients/Vetted_Snort_Client'
-SID_START = 50000152
+SID_START = 50000424
