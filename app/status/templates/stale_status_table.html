@@ -22,7 +22,7 @@
     <input type="checkbox" autocomplete="off"> Network - Bro Intel
   </label>
   <label class="btn btn-primary active" id="NS">
-    <input type="checkbox" autocomplete="off"> Network - Snort
+    <input type="checkbox" autocomplete="off"> Network - Snort/Suricata
   </label>
   <label class="btn btn-primary active" id="BY">
     <input type="checkbox" autocomplete="off"> Binary - Yara
@@ -77,8 +77,8 @@
   </div>
 </div>
 
-<div class="row" id="snort_div">
-  <h3>Network -<small> SNORT</small></h3>
+<div class="row" id="snort_suricata_div">
+  <h3>Network -<small> SNORT/SURICATA</small></h3>
   <div class="entries">
   <div class="table-responsive">
   <table class="table table-bordered">
@@ -187,7 +187,7 @@ button.onclick = function() {
 var button = document.getElementById('NS'); 
 
 button.onclick = function() {
-    var div = document.getElementById('snort_div');
+    var div = document.getElementById('snort_suricata_div');
     if (div.style.display !== 'none') {
         div.style.display = 'none';
     }

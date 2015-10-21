@@ -8,7 +8,7 @@ from sqlalchemy import desc
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, send_from_directory
 from app import db
 from app.views import login_required
-from app.models import Network_Bro_Intel_dt, Network_Snort_dt, Binary_Yara_dt, Feeds
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Feeds
 
 ################
 #### config ####
@@ -34,10 +34,10 @@ def welcome():
     NBI_vettedcount = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted').count()
     NBI_stalecount = db.session.query(Network_Bro_Intel_dt).filter_by(status='stale').count()
 
-    NS_opencount = db.session.query(Network_Snort_dt).filter_by(status='open').count()
-    NS_reviewingcount = db.session.query(Network_Snort_dt).filter_by(status='reviewing').count()
-    NS_vettedcount = db.session.query(Network_Snort_dt).filter_by(status='vetted').count()
-    NS_stalecount = db.session.query(Network_Snort_dt).filter_by(status='stale').count()
+    NS_opencount = db.session.query(Network_Snort_Suricata_dt).filter_by(status='open').count()
+    NS_reviewingcount = db.session.query(Network_Snort_Suricata_dt).filter_by(status='reviewing').count()
+    NS_vettedcount = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted').count()
+    NS_stalecount = db.session.query(Network_Snort_Suricata_dt).filter_by(status='stale').count()
 
     BY_opencount = db.session.query(Binary_Yara_dt).filter_by(status='open').count()
     BY_reviewingcount = db.session.query(Binary_Yara_dt).filter_by(status='reviewing').count()
@@ -45,7 +45,7 @@ def welcome():
     BY_stalecount = db.session.query(Binary_Yara_dt).filter_by(status='stale').count()
 
     NBI_mostrecent = db.session.query(Network_Bro_Intel_dt).order_by(desc('created_date')).limit(10)
-    NS_mostrecent = db.session.query(Network_Snort_dt).order_by(desc('created_date')).limit(10)
+    NS_mostrecent = db.session.query(Network_Snort_Suricata_dt).order_by(desc('created_date')).limit(10)
     BY_mostrecent = db.session.query(Binary_Yara_dt).order_by(desc('created_date')).limit(10)
 
     mostrecentlist = []

@@ -146,16 +146,16 @@ class Network_Bro_Intel_dt(db.Model):
                                   _set_i, 
                                   "Property to clean json form output")
 
-class Network_Snort_dt(db.Model):
+class Network_Snort_Suricata_dt(db.Model):
 
-    __tablename__ = 'N_snort'
+    __tablename__ = 'N_snort_suricata'
 
     id = db.Column(db.Integer, primary_key=True)
     type_hash = db.Column(db.String, unique=True)
     source = db.Column(db.String)
-    snort_indicators = db.Column(JSON)
+    snort_suricata_indicators = db.Column(JSON)
     d_type = db.Column(db.String)
-    tags = db.relationship('Tag', secondary=lambda: Nsnort_tags_relation_table)
+    tags = db.relationship('Tag', secondary=lambda: Nsnort_suricata_tags_relation_table)
     notes = db.Column(db.String)
     localfile = db.Column(db.String)
     localtxtfile = db.Column(db.String)
@@ -171,8 +171,8 @@ class Network_Snort_dt(db.Model):
     def __init__(self,
         type_hash = None,
         source = None, 
-        snort_indicators = None,
-        d_type = 'Network - Snort',
+        snort_suricata_indicators = None,
+        d_type = 'Network - Snort/Suricata',
         tags = None,
         notes = None,
         localcsvfile = None,
@@ -189,7 +189,7 @@ class Network_Snort_dt(db.Model):
 
         self.type_hash = type_hash
         self.source = source
-        self.snort_indicators = snort_indicators
+        self.snort_suricata_indicators = snort_suricata_indicators
         self.d_type = d_type
         self.tags = tags
         self.notes = notes
@@ -211,7 +211,7 @@ class Network_Snort_dt(db.Model):
     ### helper properties ###
     #########################
 
-    network_snort_tags = association_proxy('tags', 'tag_table')
+    network_snort_suricata_tags = association_proxy('tags', 'tag_table')
 
     def _find_or_create_tag(self, tag):
 
@@ -250,7 +250,7 @@ class Network_Snort_dt(db.Model):
 
     def _get_i(self):
 
-        return self.snort_indicators
+        return self.snort_suricata_indicators
 
     def _set_i(self, value):
 
@@ -261,7 +261,7 @@ class Network_Snort_dt(db.Model):
 
         out = json.dumps(final)
         newout = json.loads(out)
-        self.snort_indicators = newout
+        self.snort_suricata_indicators = newout
 
     newline_indicators = property(_get_i, 
                                   _set_i, 
@@ -521,9 +521,9 @@ Nbro_intel_tags_relation_table = db.Table('N_bro_intel_tags', db.Model.metadata,
     db.Column('n_bro_intel_id', db.Integer, db.ForeignKey('N_bro_intel.id', onupdate="CASCADE", ondelete="SET NULL"))
 )
 
-Nsnort_tags_relation_table = db.Table('N_snort_tags', db.Model.metadata,
+Nsnort_suricata_tags_relation_table = db.Table('N_snort_suricata_tags', db.Model.metadata,
     db.Column('tag_id', db.Integer, db.ForeignKey('tag_table.id', onupdate="CASCADE", ondelete="SET NULL")),
-    db.Column('n_snort_id', db.Integer, db.ForeignKey('N_snort.id', onupdate="CASCADE", ondelete="SET NULL"))
+    db.Column('n_snort_suricata_id', db.Integer, db.ForeignKey('N_snort_suricata.id', onupdate="CASCADE", ondelete="SET NULL"))
 )
 
 Byara_tags_relation_table = db.Table('B_yara_tags', db.Model.metadata,

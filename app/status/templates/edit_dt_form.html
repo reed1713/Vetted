@@ -9,9 +9,9 @@
   <div class="page-header">
     <h2>Edit <span class="label label-default">Network - Bro Intel</span></h2>
   </div>
-{% elif e.d_type == 'Network - Snort' %}
+{% elif e.d_type == 'Network - Snort_Suricata' %}
   <div class="page-header">
-    <h2>Edit <span class="label label-warning">Network - Snort</span></h2>
+    <h2>Edit <span class="label label-warning">Network - Snort/Suricata</span></h2>
   </div>
 {% elif e.d_type == 'Binary - Yara' %}
   <div class="page-header">
@@ -71,8 +71,8 @@
 
         {% if e.d_type == 'Network - Bro Intel' %}
         <h4><span class="label label-default" data-toggle="tooltip" data-placement="top" title="Expected Bro_Intel types: FILE_HASH, ADDR, DOMAIN, EMAIL, FILE_NAME, URL, CERT_HASH, SOFTWARE, USER_NAME, PUBKEY_HASH. Format = intel_type<space>:<space>indicator. Values separated by \r\n."><b>Network - Bro Intel indicators *</b></span></h4>
-        {% elif e.d_type == 'Network - Snort' %}
-        <h4><span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n\r\n. Seperate snort signatures with a single space."><b>Network - Snort *</b></span></h4>
+        {% elif e.d_type == 'Network - Snort_Suricata' %}
+        <h4><span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n\r\n. Seperate snort_suricata signatures with a single space."><b>Network - Snort/Suricata *</b></span></h4>
         {% elif e.d_type == 'Binary - Yara' %}
         <h4><span class="label label-primary" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n}\r\n\r\n. Seperate yara signatures with a single space."><b>Binary - Yara indicators *</b></span></h4>
         {% endif %}

@@ -28,11 +28,11 @@ The idea behind this project is to create a simple indicator management app that
 
 ### Detection types
 
-Supported detection types: 'Bro Intel', 'Snort', 'Yara'.
+Supported detection types: 'Bro Intel', 'Snort_Suricata', 'Yara'.
 
 ### API clients
 
-Bro Intel, Snort. (Both tested and working on Security Onion)
+Bro Intel, Snort_Suricata. (Both tested and working on Security Onion)
 
 ### Installing
 

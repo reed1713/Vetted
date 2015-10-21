@@ -6,12 +6,12 @@
 {% block content %}
 
 <div class="page-header">
-  <h2>Manual <span class="label label-warning">Network - Snort</span>
+  <h2>Manual <span class="label label-warning">Network - Snort/Suricata</span>
 </div>
 
 <ul class="nav nav-tabs">
   <li role="presentation"><a href="{{ url_for('scrape.manual_NBI') }}">Network - Bro Intel</a></li>
-  <li role="presentation" class="active"><a href="{{ url_for('scrape.manual_NS') }}">Network - Snort</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('scrape.manual_NS') }}">Network - Snort/Suricata</a></li>
   <li role="presentation"><a href="{{ url_for('scrape.manual_BY') }}">Binary - Yara</a></li>
 </ul>
 
@@ -40,7 +40,7 @@
 
         {{ wtf.form_field(form.notes, placeholder="notes") }}
 
-        <h4><span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n\r\n. Seperate snort signatures with a single space."><b>Network - Snort indicators *</b></span></h4>
+        <h4><span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n\r\n. Seperate snort/suricata signatures with a single space."><b>Network - Snort/Suricata indicators *</b></span></h4>
 
         {{ wtf.form_field(form.newlinei, placeholder="indicators") }}
 

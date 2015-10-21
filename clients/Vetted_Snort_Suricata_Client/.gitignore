@@ -1,0 +1,6 @@
+vetted_snort_suricata_client.log
+reset_db.py
+source_sid.db
+testrule.py
+testsid.map
+*.pyc

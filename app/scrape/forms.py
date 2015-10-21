@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Optional
 
 class URLScrape(Form):
 	N_BI_checkbx = BooleanField('Network - Bro Intel', default=True)
-	N_S_checkbx = BooleanField('Network - Snort', default=False)
+	N_S_checkbx = BooleanField('Network - Snort_Suricata', default=False)
 	B_Y_checkbx = BooleanField('Binary - Yara', default=False)
 	url = TextField(
 		validators=[DataRequired()],
@@ -20,7 +20,7 @@ class URLScrape(Form):
 	)
 class UploadScrape(Form):
 	N_BI_checkbx = BooleanField('Network - Bro Intel', default=True)
-	N_S_checkbx = BooleanField('Network - Snort', default=False)
+	N_S_checkbx = BooleanField('Network - Snort_Suricata', default=False)
 	B_Y_checkbx = BooleanField('Binary - Yara', default=False)
 	uploadpath = FileField(        
 		'upload',

@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from app.status.forms import EditScrape
 from app import db, docs
 from app.views import login_required, admin, cleantags, clean_NBI
-from app.models import Network_Bro_Intel_dt, Network_Snort_dt, Binary_Yara_dt
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt
 
 #python lib
 import json
@@ -63,7 +63,7 @@ def view_status(view_id):
     error = None
     hash_id = view_id
     NBI_view_vetted_status = db.session.query(Network_Bro_Intel_dt)
-    NS_view_vetted_status = db.session.query(Network_Snort_dt)
+    NS_view_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_view_vetted_status = db.session.query(Binary_Yara_dt)
 
     for view in NBI_view_vetted_status:
@@ -82,7 +82,7 @@ def view_status(view_id):
                 )
     for view in NS_view_vetted_status:
         if view.type_hash == hash_id:
-            newlinei = ''.join(view.snort_indicators)
+            newlinei = ''.join(view.snort_suricata_indicators)
             strtags = listtostring(view.tags)
             form = EditScrape(obj=view,
                         newlinei=newlinei,
@@ -118,7 +118,7 @@ def view_status(view_id):
 def jsondl(source_id):
     hash_id = source_id
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='vetted')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
 
     for json_d in NBI_ids:
@@ -149,7 +149,7 @@ def jsondl(source_id):
 
             data = {
             'source': json_d.source,
-            'indicators': json_d.snort_indicators,
+            'indicators': json_d.snort_suricata_indicators,
             'tags' : ct,
             'created_date' : jtime,
             'notes' : json_d.notes
@@ -188,7 +188,7 @@ def csvdl(source_id):
     error = None
     hash_id = source_id
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='vetted')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
 
     for csv_d in NBI_ids:
@@ -207,7 +207,7 @@ def csvdl(source_id):
             ct = cleantags(csv_d.tags)
             fn = csv_d.localcsvfile
             jtime = timeconvert(csv_d.created_date)
-            csvify(fn, csv_d.snort_indicators, csv_d.source, jtime, ct, csv_d.notes)
+            csvify(fn, csv_d.snort_suricata_indicators, csv_d.source, jtime, ct, csv_d.notes)
             return send_from_directory(
                     directory=docs, 
                     filename=fn,
@@ -244,7 +244,7 @@ def download(filename):
 def open_status():
     error = None
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='open')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='open')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='open')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='open')
     return render_template('open_status_table.html',
     	NBI_ids=NBI_ids,
@@ -259,7 +259,7 @@ def open_status():
 def delete_open_status(open_id):
     hash_id = open_id
     NBI_delete_open_status = db.session.query(Network_Bro_Intel_dt)
-    NS_delete_open_status = db.session.query(Network_Snort_dt)
+    NS_delete_open_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_open_status = db.session.query(Binary_Yara_dt)
 
     for delete in NBI_delete_open_status:
@@ -268,7 +268,7 @@ def delete_open_status(open_id):
             d.delete()
     for delete in NS_delete_open_status:
         if delete.type_hash == hash_id:
-            d = db.session.query(Network_Snort_dt).filter_by(id=delete.id)
+            d = db.session.query(Network_Snort_Suricata_dt).filter_by(id=delete.id)
             d.delete()
     for delete in BY_delete_open_status:
         if delete.type_hash == hash_id:
@@ -286,7 +286,7 @@ def edit_open_status(open_id):
     error = None
     hash_id = open_id
     NBI_edit_open_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_open_status = db.session.query(Network_Snort_dt)
+    NS_edit_open_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_open_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_open_status:
@@ -333,18 +333,18 @@ def edit_open_status(open_id):
                 )
     for edit in NS_edit_open_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
                         newlinei=newlinei,
                         )
             if request.method == 'POST':
-                d_obj = Network_Snort_dt.query.get(edit.id)
+                d_obj = Network_Snort_Suricata_dt.query.get(edit.id)
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.snort_indicators = []
+                    d_obj.snort_suricata_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -427,7 +427,7 @@ def edit_open_status(open_id):
 def reviewing_status():
     error = None
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='reviewing')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='reviewing')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='reviewing')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='reviewing')
     return render_template('reviewing_status_table.html',
         NBI_ids=NBI_ids,
@@ -443,7 +443,7 @@ def reviewing_status():
 def delete_reviewing_status(reviewing_id):
     hash_id = reviewing_id
     NBI_delete_reviewing_status = db.session.query(Network_Bro_Intel_dt)
-    NS_delete_reviewing_status = db.session.query(Network_Snort_dt)
+    NS_delete_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_reviewing_status = db.session.query(Binary_Yara_dt)
 
     for delete in NBI_delete_reviewing_status:
@@ -452,7 +452,7 @@ def delete_reviewing_status(reviewing_id):
             d.delete()
     for delete in NS_delete_reviewing_status:
         if delete.type_hash == hash_id:
-            d = db.session.query(Network_Snort_dt).filter_by(id=delete.id)
+            d = db.session.query(Network_Snort_Suricata_dt).filter_by(id=delete.id)
             d.delete()
     for delete in BY_delete_reviewing_status:
         if delete.type_hash == hash_id:
@@ -469,7 +469,7 @@ def edit_reviewing_button_status(reviewing_id):
     error = None
     hash_id = reviewing_id
     NBI_edit_reviewing_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_reviewing_status = db.session.query(Network_Snort_dt)
+    NS_edit_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_reviewing_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_reviewing_status:
@@ -495,7 +495,7 @@ def edit_reviewing_button_status(reviewing_id):
             )
     for edit in NS_edit_reviewing_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -541,7 +541,7 @@ def edit_reviewing_status(reviewing_id):
     error = None
     hash_id = reviewing_id
     NBI_edit_reviewing_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_reviewing_status = db.session.query(Network_Snort_dt)
+    NS_edit_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_reviewing_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_reviewing_status:
@@ -588,18 +588,18 @@ def edit_reviewing_status(reviewing_id):
                 )
     for edit in NS_edit_reviewing_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
                         newlinei=newlinei,
                         )
             if request.method == 'POST':
-                d_obj = Network_Snort_dt.query.get(edit.id)
+                d_obj = Network_Snort_Suricata_dt.query.get(edit.id)
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.snort_indicators = []
+                    d_obj.snort_suricata_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -682,7 +682,7 @@ def edit_reviewing_status(reviewing_id):
 def vetted_status():
     error = None
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='vetted')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
     return render_template('vetted_status_table.html',
         NBI_ids=NBI_ids,
@@ -698,7 +698,7 @@ def vetted_status():
 def delete_vetted_status(vetted_id):
     hash_id = vetted_id
     NBI_delete_vetted_status = db.session.query(Network_Bro_Intel_dt)
-    NS_delete_vetted_status = db.session.query(Network_Snort_dt)
+    NS_delete_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_vetted_status = db.session.query(Binary_Yara_dt)
 
     for delete in NBI_delete_vetted_status:
@@ -707,7 +707,7 @@ def delete_vetted_status(vetted_id):
             d.delete()
     for delete in NS_delete_vetted_status:
         if delete.type_hash == hash_id:
-            d = db.session.query(Network_Snort_dt).filter_by(id=delete.id)
+            d = db.session.query(Network_Snort_Suricata_dt).filter_by(id=delete.id)
             d.delete()
     for delete in BY_delete_vetted_status:
         if delete.type_hash == hash_id:
@@ -725,7 +725,7 @@ def edit_vetted_status(vetted_id):
     error = None
     hash_id = vetted_id
     NBI_edit_vetted_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_vetted_status = db.session.query(Network_Snort_dt)
+    NS_edit_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_vetted_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_vetted_status:
@@ -772,18 +772,18 @@ def edit_vetted_status(vetted_id):
                 )
     for edit in NS_edit_vetted_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
                         newlinei=newlinei,
                         )
             if request.method == 'POST':
-                d_obj = Network_Snort_dt.query.get(edit.id)
+                d_obj = Network_Snort_Suricata_dt.query.get(edit.id)
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.snort_indicators = []
+                    d_obj.snort_suricata_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -866,7 +866,7 @@ def edit_vetted_status(vetted_id):
 def stale_status():
     error = None
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='stale')
-    NS_ids = db.session.query(Network_Snort_dt).filter_by(status='stale')
+    NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='stale')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='stale')
     return render_template('stale_status_table.html',
         NBI_ids=NBI_ids,
@@ -882,7 +882,7 @@ def stale_status():
 def delete_stale_status(stale_id):
     hash_id = stale_id
     NBI_delete_stale_status = db.session.query(Network_Bro_Intel_dt)
-    NS_delete_stale_status = db.session.query(Network_Snort_dt)
+    NS_delete_stale_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_stale_status = db.session.query(Binary_Yara_dt)
 
     for delete in NBI_delete_stale_status:
@@ -891,7 +891,7 @@ def delete_stale_status(stale_id):
             d.delete()
     for delete in NS_delete_stale_status:
         if delete.type_hash == hash_id:
-            d = db.session.query(Network_Snort_dt).filter_by(id=delete.id)
+            d = db.session.query(Network_Snort_Suricata_dt).filter_by(id=delete.id)
             d.delete()
     for delete in BY_delete_stale_status:
         if delete.type_hash == hash_id:
@@ -909,7 +909,7 @@ def edit_stale_status(stale_id):
     error = None
     hash_id = stale_id
     NBI_edit_stale_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_stale_status = db.session.query(Network_Snort_dt)
+    NS_edit_stale_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_stale_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_stale_status:
@@ -956,18 +956,18 @@ def edit_stale_status(stale_id):
                 )
     for edit in NS_edit_stale_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
                         newlinei=newlinei,
                         )
             if request.method == 'POST':
-                d_obj = Network_Snort_dt.query.get(edit.id)
+                d_obj = Network_Snort_Suricata_dt.query.get(edit.id)
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.snort_indicators = []
+                    d_obj.snort_suricata_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -1050,7 +1050,7 @@ def edit_stale_status(stale_id):
 def all_status():
     error = None
     NBI_ids = db.session.query(Network_Bro_Intel_dt)
-    NS_ids = db.session.query(Network_Snort_dt)
+    NS_ids = db.session.query(Network_Snort_Suricata_dt)
     BY_ids = db.session.query(Binary_Yara_dt)
     return render_template('all_status_table.html',
         NBI_ids=NBI_ids,
@@ -1066,7 +1066,7 @@ def all_status():
 def delete_all_status(all_id):
     hash_id = all_id
     NBI_delete_all_status = db.session.query(Network_Bro_Intel_dt)
-    NS_delete_all_status = db.session.query(Network_Snort_dt)
+    NS_delete_all_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_all_status = db.session.query(Binary_Yara_dt)
 
     for delete in NBI_delete_all_status:
@@ -1075,7 +1075,7 @@ def delete_all_status(all_id):
             d.delete()
     for delete in NS_delete_all_status:
         if delete.type_hash == hash_id:
-            d = db.session.query(Network_Snort_dt).filter_by(id=delete.id)
+            d = db.session.query(Network_Snort_Suricata_dt).filter_by(id=delete.id)
             d.delete()
     for delete in BY_delete_all_status:
         if delete.type_hash == hash_id:
@@ -1093,7 +1093,7 @@ def edit_all_status(all_id):
     error = None
     hash_id = all_id
     NBI_edit_all_status = db.session.query(Network_Bro_Intel_dt)
-    NS_edit_all_status = db.session.query(Network_Snort_dt)
+    NS_edit_all_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_all_status = db.session.query(Binary_Yara_dt)
 
     for edit in NBI_edit_all_status:
@@ -1140,18 +1140,18 @@ def edit_all_status(all_id):
                 )
     for edit in NS_edit_all_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.snort_indicators)
+            newlinei = ''.join(edit.snort_suricata_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
                         newlinei=newlinei,
                         )
             if request.method == 'POST':
-                d_obj = Network_Snort_dt.query.get(edit.id)
+                d_obj = Network_Snort_Suricata_dt.query.get(edit.id)
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.snort_indicators = []
+                    d_obj.snort_suricata_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data

@@ -23,7 +23,7 @@
 
       <h3>Create</h3>
       <h4>Detection Types</h4>
-      <h5>Network - Bro Intel, Network - Snort, Binary - Yara<h5>
+      <h5>Network - Bro Intel, Network - Snort/Suricata, Binary - Yara<h5>
         <p>
           <strong>- Bro_Intel types: ADDR, DOMAIN, FILE_HASH, CERT_HASH, EMAIL, FILENAME, URL</strong>
         </p>
@@ -56,7 +56,7 @@
           <strong>indicators:</strong>
           <h5>BRO_INTEL</h5>
            <code> indicator type : indicator value</code>. indicators are split by <code>r\n</code>. all whitespace will be removed, as well as any <code>\r</code> before inputting into to the database. reference the <strong>Bro_Intel type</strong> for the expected indicator type values. 
-          <h5>SNORT<h5>
+          <h5>SNORT/SURICATA<h5>
             signatures seperate by a space or <code>\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
           <h5>YARA</h5>
             signatures seperate by a space or <code>\r\n}\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
@@ -80,9 +80,9 @@
           <br>
         <code>GET /api/vetted/network_bro_intel/json/{id}</code> - pull a vetted bro intel json object
           <br>
-        <code>GET /api/vetted/network_snort/json/</code> - pull all vetted snort json objects
+        <code>GET /api/vetted/network_snort_suricata/json/</code> - pull all vetted snort suricata json objects
           <br>
-        <code>GET /api/vetted/network_snort/json/{id}</code> - pull a vetted snort json object
+        <code>GET /api/vetted/network_snort_suricata/json/{id}</code> - pull a vetted snort suricata json object
           <br>
         <code>GET /api/vetted/binary_yara/json/</code> - pull all vetted yara json objects
           <br>
@@ -95,17 +95,6 @@
         </p>
 
       <hr>
-
-      <h3>Working on...</h3>
-        <p>
-          - more research modules
-        </p>         
-        <p>
-          - task queue (redis, celery)
-        </p>
-        <p>
-          - simplify install
-        </p>
 
     </div>
 {% endblock %}

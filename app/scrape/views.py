@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from app.scrape.forms import URLScrape, UploadScrape, Manual
 from app import db, docs
 from app.views import login_required, clean_NBI
-from app.models import Network_Bro_Intel_dt, Network_Snort_dt, Binary_Yara_dt, Tag
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Tag
 from werkzeug import secure_filename
 
 #local helper methods
@@ -23,7 +23,7 @@ import re
 
 #global vars
 NBI_HASH_STRING = 'network_bro_intel'
-NS_HASH_STRING = 'network_snort'
+NS_HASH_STRING = 'network_snort_suricata'
 BY_HASH_STRING = 'binary_yara'
 
 ################
@@ -45,7 +45,7 @@ def tolistofdicts(stringtoparse):
     newout = json.loads(out)
     return newout
 
-def snort_sig_to_list(listofsigs):
+def snort_suricata_sig_to_list(listofsigs):
 
     split_sigs = re.split(r'\r\n\r\n', listofsigs)
     addback = [x + '\r\n\r\n' for x in split_sigs[:-1]]
@@ -131,7 +131,7 @@ def scrape():
                 error.append(error_nbi)
 
         if form.N_S_checkbx.data == True:
-            result = Network_Snort_dt(
+            result = Network_Snort_Suricata_dt(
             source = cleaned_url,
             type_hash = hash_type(NS_HASH_STRING, cleaned_url),
             priority = form.priority.data,
@@ -140,16 +140,16 @@ def scrape():
             localtxtfile = txtfile,
             localcsvfile = csvfile,
             tags = [],
-            snort_indicators=[],
+            snort_suricata_indicators=[],
             )
             result.str_tags = ktags
             try:
                 db.session.add(result)
                 db.session.commit()
-                flash('successfully created network-snort detection object')
+                flash('successfully created network-snort_suricata detection object')
             except IntegrityError:
                 db.session.rollback()
-                error_ns = "source and network-snort detection type object already exists."
+                error_ns = "source and network-snort_suricata detection type object already exists."
                 error.append(error_ns)
         if form.B_Y_checkbx.data == True:
             result = Binary_Yara_dt(
@@ -250,7 +250,7 @@ def upload_scrape():
                     error.append(error_nbi)
 
             if form.N_S_checkbx.data == True:
-                result = Network_Snort_dt(
+                result = Network_Snort_Suricata_dt(
                 source = cleansourcename,
                 type_hash = hash_type(NS_HASH_STRING, cleansourcename),
                 priority = form.priority.data,
@@ -259,16 +259,16 @@ def upload_scrape():
                 localtxtfile = txtfile,
                 localcsvfile = csvfile,
                 tags = [],
-                snort_indicators=[],
+                snort_suricata_indicators=[],
                 )
                 result.str_tags = ktags
                 try:
                     db.session.add(result)
                     db.session.commit()
-                    flash('successfully created network-snort detection object')
+                    flash('successfully created network-snort_suricata detection object')
                 except IntegrityError:
                     db.session.rollback()
-                    error_ns = "source and network-snort detection type object already exists."
+                    error_ns = "source and network-snort_suricata detection type object already exists."
                     error.append(error_ns)
             if form.B_Y_checkbx.data == True:
                 result = Binary_Yara_dt(
@@ -362,7 +362,7 @@ def manual_NBI():
                 username=session['name'],
             )
 
-@scrape_blueprint.route('/manual/network_snort/', methods=['GET', 'POST'])
+@scrape_blueprint.route('/manual/network_snort_suricata/', methods=['GET', 'POST'])
 @login_required
 def manual_NS():
     error = None
@@ -375,15 +375,15 @@ def manual_NS():
         )
     if request.method == 'POST':
         cleansourcename = cleanUrl(form.source.data)
-        indicators = snort_sig_to_list(form.newlinei.data)
+        indicators = snort_suricata_sig_to_list(form.newlinei.data)
         filename = downloadedFilename(cleansourcename)
         if indicators == None:
             indicators = []
-        result = Network_Snort_dt(
+        result = Network_Snort_Suricata_dt(
             type_hash = hash_type(NS_HASH_STRING, cleansourcename),
             status = form.status.data,
             source = cleansourcename,
-            snort_indicators = indicators,
+            snort_suricata_indicators = indicators,
             priority = form.priority.data,
             created_by = session['name'],
             tags = [],
@@ -394,10 +394,10 @@ def manual_NS():
         try:
             db.session.add(result)
             db.session.commit()
-            flash('successfully created network-snort detection object')
+            flash('successfully created network-snort_suricata detection object')
             return redirect(url_for('scrape.manual_NS'))
         except IntegrityError:
-            error = 'source and network-snort detection type object already exists.'
+            error = 'source and network-snort_suricata detection type object already exists.'
             return render_template('manual_NS.html', 
                 form=form, 
                 error=error, 

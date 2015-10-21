@@ -9,12 +9,11 @@ from app.models import *
 from flask import flash, redirect, session, url_for, \
     render_template, request, jsonify, make_response, abort
 from functools import wraps
-from app.models import Network_Snort_dt
+from app.models import Network_Snort_Suricata_dt
 
 ##########################
 #### helper functions ####
 ##########################
-
 
 def login_required(test):
     @wraps(test)
@@ -197,22 +196,22 @@ def api_bro_intel_vetted(dt_id):
         return make_response(jsonify(result), code)
 
     #####################
-    ### Network Snort ###
+    ### Network Snort_Suricata ###
     #####################
 
-# Get all snort vetted objects:
-@app.route('/api/vetted/network_snort/json/')
+# Get all snort_suricata vetted objects:
+@app.route('/api/vetted/network_snort_suricata/json/')
 @apikey_required
-def api_all_snort_vetted():
+def api_all_snort_suricata_vetted():
     if request.method == 'GET':
-        results = db.session.query(Network_Snort_dt).filter_by(status='vetted').offset(0).all()
+        results = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted').offset(0).all()
         json_results = []
         if results:
             for result in results:
                 t = result.tags
                 ct = cleantags(t)
                 data = {
-                    'indicators': result.snort_indicators,
+                    'indicators': result.snort_suricata_indicators,
                     'source': result.source,
                     'created_date' : result.created_date,
                     'tags' : ct,
@@ -226,17 +225,17 @@ def api_all_snort_vetted():
             code = 404
         return make_response(jsonify(vetted=json_results), code)
 
-# Get specified snort vetted object
-@app.route('/api/vetted/network_snort/json/<int:dt_id>')
+# Get specified snort_suricata vetted object
+@app.route('/api/vetted/network_snort_suricata/json/<int:dt_id>')
 @apikey_required
-def api_snort_vetted(dt_id):
+def api_snort_suricata_vetted(dt_id):
     if request.method == 'GET':
-        result = db.session.query(Network_Snort_dt).filter_by(id=dt_id, status='vetted').first()
+        result = db.session.query(Network_Snort_Suricata_dt).filter_by(id=dt_id, status='vetted').first()
         if result:
             t = result.tags
             ct = cleantags(t)
             result = {
-                'indicators': result.snort_indicators,
+                'indicators': result.snort_suricata_indicators,
                 'source': result.source,
                 'created_date' : result.created_date,
                 'tags' : ct,
@@ -250,17 +249,17 @@ def api_snort_vetted(dt_id):
             code = 404
         return make_response(jsonify(result), code)
 
-# POST updated snort indicators
-@app.route('/api/vetted/network_snort/json/<string:type_hash>', methods=['POST'])
+# POST updated snort_suricata indicators
+@app.route('/api/vetted/network_snort_suricata/json/<string:type_hash>', methods=['POST'])
 @apikey_admin
-def api_snort_vetted_post(type_hash):
+def api_snort_suricata_vetted_post(type_hash):
     if request.method == 'POST':
-        result = db.session.query(Network_Snort_dt).filter_by(type_hash=type_hash).first()
+        result = db.session.query(Network_Snort_Suricata_dt).filter_by(type_hash=type_hash).first()
         data = request.data
         indicators = json.loads(data)
         if result:
-            d_obj = Network_Snort_dt.query.get(result.id)
-            d_obj.snort_indicators = indicators['indicators']
+            d_obj = Network_Snort_Suricata_dt.query.get(result.id)
+            d_obj.snort_suricata_indicators = indicators['indicators']
             db.session.commit()
             return make_response(str(200))
         else:

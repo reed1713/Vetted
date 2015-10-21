@@ -9,9 +9,9 @@
   <div class="page-header">
     <h2>Edit <span class="label label-default">Network - Bro Intel</span></h2>
   </div>
-{% elif e.d_type == 'Network - Snort' %}
+{% elif e.d_type == 'Network - Snort_Suricata' %}
   <div class="page-header">
-    <h2>Edit <span class="label label-warning">Network - Snort</span></h2>
+    <h2>Edit <span class="label label-warning">Network - Snort/Suricata</span></h2>
   </div>
 {% elif e.d_type == 'Binary - Yara' %}
   <div class="page-header">
@@ -86,8 +86,8 @@
 
         {% if e.d_type == 'Network - Bro Intel' %}
         <h4><span class="label label-default"><b>Network - Bro Intel indicators</b></span></h4>
-        {% elif e.d_type == 'Network - Snort' %}
-        <h4><span class="label label-warning"><b>Network - Snort</b></span></h4>
+        {% elif e.d_type == 'Network - Snort_Suricata' %}
+        <h4><span class="label label-warning"><b>Network - Snort/Suricata</b></span></h4>
         {% elif e.d_type == 'Binary - Yara' %}
         <h4><span class="label label-primary"><b>Binary - Yara indicators</b></span></h4>
         {% endif %}
