@@ -17,6 +17,10 @@
   <div class="page-header">
     <h2>Edit <span class="label label-primary">Binary - Yara</span></h2>
   </div>
+{% elif e.d_type == 'Memory - Yara' %}
+  <div class="page-header">
+    <h2>Edit <span class="label label-danger">Memory - Yara</span></h2>
+  </div>
 {% endif %}
 
 
@@ -30,7 +34,7 @@
   </div>
 {% if e.localfile != None %}
   <form action="{{ url_for('status.download', filename = e.localfile) }}" style="display: inline;">
-    <button class="btn btn-md btn-info" input type="submit">Download original file</button>
+    <button class="btn btn-md btn-primary" input type="submit">Download original file</button>
   </form>&nbsp;&nbsp;
 {% endif %}
 {% if e.localtxtfile != None %}
@@ -40,10 +44,10 @@
 {% endif %}
   {% if e.status == 'vetted' %}
     <form action="{{ url_for('status.jsondl', source_id = e.type_hash) }}" style="display: inline;">
-      <button class="btn btn-md btn-warning" input type="submit">Download json file</button>
+      <button class="btn btn-md btn-primary" input type="submit">Download json file</button>
     </form>&nbsp;&nbsp;
     <form action="{{ url_for('status.csvdl', source_id = e.type_hash) }}" style="display: inline;">
-      <button class="btn btn-md btn-danger" input type="submit">Download csv file</button>
+      <button class="btn btn-md btn-primary" input type="submit">Download csv file</button>
     </form>&nbsp;&nbsp;
   {% endif %}
 </div>
@@ -90,6 +94,8 @@
         <h4><span class="label label-warning"><b>Network - Snort/Suricata</b></span></h4>
         {% elif e.d_type == 'Binary - Yara' %}
         <h4><span class="label label-primary"><b>Binary - Yara indicators</b></span></h4>
+        {% elif e.d_type == 'Memory - Yara' %}
+        <h4><span class="label label-primary"><b>Memory - Yara indicators</b></span></h4>
         {% endif %}
 
           <b>{{ wtf.form_field(form.newlinei, placeholder="indicators") }}</b>

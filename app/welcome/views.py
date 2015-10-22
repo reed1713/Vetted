@@ -8,7 +8,7 @@ from sqlalchemy import desc
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint, send_from_directory
 from app import db
 from app.views import login_required
-from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Feeds
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Memory_Yara_dt
 
 ################
 #### config ####
@@ -44,9 +44,15 @@ def welcome():
     BY_vettedcount = db.session.query(Binary_Yara_dt).filter_by(status='vetted').count()
     BY_stalecount = db.session.query(Binary_Yara_dt).filter_by(status='stale').count()
 
+    MY_opencount = db.session.query(Memory_Yara_dt).filter_by(status='open').count()
+    MY_reviewingcount = db.session.query(Memory_Yara_dt).filter_by(status='reviewing').count()
+    MY_vettedcount = db.session.query(Memory_Yara_dt).filter_by(status='vetted').count()
+    MY_stalecount = db.session.query(Memory_Yara_dt).filter_by(status='stale').count()
+
     NBI_mostrecent = db.session.query(Network_Bro_Intel_dt).order_by(desc('created_date')).limit(10)
     NS_mostrecent = db.session.query(Network_Snort_Suricata_dt).order_by(desc('created_date')).limit(10)
     BY_mostrecent = db.session.query(Binary_Yara_dt).order_by(desc('created_date')).limit(10)
+    MY_mostrecent = db.session.query(Memory_Yara_dt).order_by(desc('created_date')).limit(10)
 
     mostrecentlist = []
     for nbi in NBI_mostrecent:
@@ -55,6 +61,8 @@ def welcome():
         mostrecentlist.extend([[int(ns.created_date.strftime("%s")) * 1000, ns.created_date, ns.source, ns.d_type, ns.status]])
     for by in BY_mostrecent:
         mostrecentlist.extend([[int(by.created_date.strftime("%s")) * 1000, by.created_date, by.source, by.d_type, by.status]])
+    for my in MY_mostrecent:
+        mostrecentlist.extend([[int(my.created_date.strftime("%s")) * 1000, my.created_date, my.source, my.d_type, my.status]])
 
     test = sorted(mostrecentlist, key=lambda x: x[0], reverse=True)
     finalsortedlist = test[-0:20]
@@ -74,6 +82,10 @@ def welcome():
             BY_reviewingcount=BY_reviewingcount,
             BY_vettedcount=BY_vettedcount,
             BY_stalecount=BY_stalecount,
+            MY_opencount=MY_opencount,
+            MY_reviewingcount=MY_reviewingcount,
+            MY_vettedcount=MY_vettedcount,
+            MY_stalecount=MY_stalecount,
             finalsortedlist=finalsortedlist,
             )
 

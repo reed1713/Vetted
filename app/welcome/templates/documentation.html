@@ -10,26 +10,27 @@
         <h1>Documentation</h1>
       </div>
       <h3>Research</h3>
-      <h4>Tactical Intel</h4>
+      <h4>News</h4>
+      <h5>Tactical Intel</h5>
       <p>
-        uses python feedparser lib to pull and parse rss and atom feeds. tactical feeds should contain actionable intel sources that often provide useful threat indicators.
+        - uses python feedparser lib to pull and parse rss and atom feeds. tactical feeds should contain actionable intel sources that often provide useful threat indicators.
       </p>
-      <h4>Strategic Intel</h4>
+      <h5>Strategic Intel</h5>
       <p>
-        uses python feedparser lib to pull and parse rss and atom feeds.
+        - uses python feedparser lib to pull and parse rss and atom feeds.
       </p>
       
       <hr>
 
       <h3>Create</h3>
       <h4>Detection Types</h4>
-      <h5>Network - Bro Intel, Network - Snort/Suricata, Binary - Yara<h5>
+      <h5><strong>Network - Bro Intel, Network - Snort/Suricata, Binary - Yara, Memory - Yara</strong><h5>
         <p>
-          <strong>- Bro_Intel types: ADDR, DOMAIN, FILE_HASH, CERT_HASH, EMAIL, FILENAME, URL</strong>
+          - <strong>Scraped Bro_Intel types:</strong> ADDR, DOMAIN, FILE_HASH, CERT_HASH, EMAIL, FILENAME, URL
         </p>
       <h4>converted file types</h4>
         <p>
-          <strong>- pdf, docx, html</strong>
+          - pdf, docx, html
         </p>
       <h4>scrape notes</h4>
         <p>
@@ -55,10 +56,12 @@
         <p>
           <strong>indicators:</strong>
           <h5>BRO_INTEL</h5>
-           <code> indicator type : indicator value</code>. indicators are split by <code>r\n</code>. all whitespace will be removed, as well as any <code>\r</code> before inputting into to the database. reference the <strong>Bro_Intel type</strong> for the expected indicator type values. 
+           <code> indicator type : indicator value</code>. indicators are split by <code>r\n</code>. all whitespace will be removed, as well as any <code>\r</code> before inputting into to the database. reference the <strong><a href=https://www.bro.org/sphinx/scripts/base/frameworks/intel/main.bro.html#type-Intel::Type>Bro Intel types</strong></a> for the expected indicator type values. 
           <h5>SNORT/SURICATA<h5>
             signatures seperate by a space or <code>\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
-          <h5>YARA</h5>
+          <h5>BIN YARA</h5>
+            signatures seperate by a space or <code>\r\n}\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
+          <h5>MEM YARA</h5>
             signatures seperate by a space or <code>\r\n}\r\n\r\n></code>. remove leading a trailing whitespace to avoid errors.
         </p>
 
@@ -84,9 +87,13 @@
           <br>
         <code>GET /api/vetted/network_snort_suricata/json/{id}</code> - pull a vetted snort suricata json object
           <br>
-        <code>GET /api/vetted/binary_yara/json/</code> - pull all vetted yara json objects
+        <code>GET /api/vetted/binary_yara/json/</code> - pull all vetted binary yara json objects
           <br>
-        <code>GET /api/vetted/binary_yara/json/{id}</code> - pull a vetted yara json object
+        <code>GET /api/vetted/binary_yara/json/{id}</code> - pull a vetted binart yara json object
+          <br>
+        <code>GET /api/vetted/memory_yara/json/</code> - pull all vetted memory yara json objects
+          <br>
+        <code>GET /api/vetted/memory_yara/json/{id}</code> - pull a vetted memory yara json object
       <hr>
 
       <h3>RBAC</h3>

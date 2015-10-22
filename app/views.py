@@ -195,9 +195,9 @@ def api_bro_intel_vetted(dt_id):
             code = 404
         return make_response(jsonify(result), code)
 
-    #####################
+    ##############################
     ### Network Snort_Suricata ###
-    #####################
+    ##############################
 
 # Get all snort_suricata vetted objects:
 @app.route('/api/vetted/network_snort_suricata/json/')
@@ -273,7 +273,7 @@ def api_snort_suricata_vetted_post(type_hash):
 # Get all yara vetted objects:
 @app.route('/api/vetted/binary_yara/json/')
 @apikey_required
-def api_all_yara_vetted():
+def api_all_bin_yara_vetted():
     if request.method == 'GET':
         results = db.session.query(Binary_Yara_dt).filter_by(status='vetted').offset(0).all()
         json_results = []
@@ -282,7 +282,7 @@ def api_all_yara_vetted():
                 t = result.tags
                 ct = cleantags(t)
                 data = {
-                    'indicators': result.yara_indicators,
+                    'indicators': result.bin_yara_indicators,
                     'source': result.source,
                     'created_date' : result.created_date,
                     'tags' : ct,
@@ -299,14 +299,68 @@ def api_all_yara_vetted():
 # Get specified yara vetted object
 @app.route('/api/vetted/binary_yara/json/<int:dt_id>')
 @apikey_required
-def api_yara_vetted(dt_id):
+def api_bin_yara_vetted(dt_id):
     if request.method == 'GET':
         result = db.session.query(Binary_Yara_dt).filter_by(id=dt_id, status='vetted').first()
         if result:
             t = result.tags
             ct = cleantags(t)
             result = {
-                'indicators': result.yara_indicators,
+                'indicators': result.bin_yara_indicators,
+                'source': result.source,
+                'created_date' : result.created_date,
+                'tags' : ct,
+                'notes' : result.notes,
+                'type_hash' : result.type_hash,
+                'priority' : result.priority,
+            }
+            code = 200
+        else:
+            result = {"sorry": "Element does not exist"}
+            code = 404
+        return make_response(jsonify(result), code)
+
+    ###################
+    ### Memory Yara ###
+    ###################
+
+# Get all yara vetted objects:
+@app.route('/api/vetted/memory_yara/json/')
+@apikey_required
+def api_all_mem_yara_vetted():
+    if request.method == 'GET':
+        results = db.session.query(Memory_Yara_dt).filter_by(status='vetted').offset(0).all()
+        json_results = []
+        if results:
+            for result in results:
+                t = result.tags
+                ct = cleantags(t)
+                data = {
+                    'indicators': result.mem_yara_indicators,
+                    'source': result.source,
+                    'created_date' : result.created_date,
+                    'tags' : ct,
+                    'notes' : result.notes,
+                    'type_hash' : result.type_hash,
+                    'priority' : result.priority,
+                        }
+                json_results.append(data)
+                code = 200
+        else:
+            code = 404
+        return make_response(jsonify(vetted=json_results), code)
+
+# Get specified yara vetted object
+@app.route('/api/vetted/memory_yara/json/<int:dt_id>')
+@apikey_required
+def api_mem_yara_vetted(dt_id):
+    if request.method == 'GET':
+        result = db.session.query(Memory_Yara_dt).filter_by(id=dt_id, status='vetted').first()
+        if result:
+            t = result.tags
+            ct = cleantags(t)
+            result = {
+                'indicators': result.mem_yara_indicators,
                 'source': result.source,
                 'created_date' : result.created_date,
                 'tags' : ct,

@@ -1,4 +1,4 @@
-<!-- app/scrape/templates/manual_NS.html -->
+<!-- app/create/templates/manual_NS.html -->
 
 {% extends "template.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
@@ -10,12 +10,13 @@
 </div>
 
 <ul class="nav nav-tabs">
-  <li role="presentation"><a href="{{ url_for('scrape.manual_NBI') }}">Network - Bro Intel</a></li>
-  <li role="presentation" class="active"><a href="{{ url_for('scrape.manual_NS') }}">Network - Snort/Suricata</a></li>
-  <li role="presentation"><a href="{{ url_for('scrape.manual_BY') }}">Binary - Yara</a></li>
+  <li role="presentation"><a href="{{ url_for('create.manual_NBI') }}">Network - Bro Intel</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('create.manual_NS') }}">Network - Snort/Suricata</a></li>
+  <li role="presentation"><a href="{{ url_for('create.manual_BY') }}">Binary - Yara</a></li>
+  <li role="presentation"><a href="{{ url_for('create.manual_MY') }}">Memory - Yara</a></li>
 </ul>
 
-<form action="{{ url_for('scrape.manual_NS') }}" method="post" enctype="multipart/form-data">
+<form action="{{ url_for('create.manual_NS') }}" method="post" enctype="multipart/form-data">
 <div class="lead"></div>
 
       {{ form.csrf_token }} 

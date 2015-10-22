@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from app.status.forms import EditScrape
 from app import db, docs
 from app.views import login_required, admin, cleantags, clean_NBI
-from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Memory_Yara_dt
 
 #python lib
 import json
@@ -65,6 +65,7 @@ def view_status(view_id):
     NBI_view_vetted_status = db.session.query(Network_Bro_Intel_dt)
     NS_view_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_view_vetted_status = db.session.query(Binary_Yara_dt)
+    MY_view_vetted_status = db.session.query(Memory_Yara_dt)
 
     for view in NBI_view_vetted_status:
         if view.type_hash == hash_id:
@@ -96,7 +97,21 @@ def view_status(view_id):
                 )
     for view in BY_view_vetted_status:
         if view.type_hash == hash_id:
-            newlinei = ''.join(view.yara_indicators)
+            newlinei = ''.join(view.bin_yara_indicators)
+            strtags = listtostring(view.tags)
+            form = EditScrape(obj=view,
+                        newlinei=newlinei,
+                        )
+            return render_template('view_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=view,
+                strtags=strtags,
+                )
+    for view in MY_view_vetted_status:
+        if view.type_hash == hash_id:
+            newlinei = ''.join(view.mem_yara_indicators)
             strtags = listtostring(view.tags)
             form = EditScrape(obj=view,
                         newlinei=newlinei,
@@ -120,6 +135,7 @@ def jsondl(source_id):
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='vetted')
 
     for json_d in NBI_ids:
         if json_d.type_hash == hash_id:
@@ -169,7 +185,27 @@ def jsondl(source_id):
 
             data = {
             'source': json_d.source,
-            'indicators': json_d.yara_indicators,
+            'indicators': json_d.bin_yara_indicators,
+            'tags' : ct,
+            'created_date' : jtime,
+            'notes' : json_d.notes
+            }
+
+            f = json.dumps(data, indent=4, sort_keys=True)
+
+            return Response(f, 
+                mimetype='application/json',
+                headers={'Content-Disposition':'attachment;filename=%s' % fn},
+                )
+    for json_d in MY_ids:
+        if json_d.type_hash == hash_id:
+            ct = cleantags(json_d.tags)
+            fn = json_d.source + '.json'
+            jtime = timeconvert(json_d.created_date)
+
+            data = {
+            'source': json_d.source,
+            'indicators': json_d.mem_yara_indicators,
             'tags' : ct,
             'created_date' : jtime,
             'notes' : json_d.notes
@@ -190,6 +226,7 @@ def csvdl(source_id):
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='vetted')
 
     for csv_d in NBI_ids:
         if csv_d.type_hash == hash_id:
@@ -218,7 +255,18 @@ def csvdl(source_id):
             ct = cleantags(csv_d.tags)
             fn = csv_d.localcsvfile
             jtime = timeconvert(csv_d.created_date)
-            csvify(fn, csv_d.yara_indicators, csv_d.source, jtime, ct, csv_d.notes)
+            csvify(fn, csv_d.bin_yara_indicators, csv_d.source, jtime, ct, csv_d.notes)
+            return send_from_directory(
+                    directory=docs, 
+                    filename=fn,
+                    as_attachment=True
+                    )
+    for csv_d in MY_ids:
+        if csv_d.type_hash == hash_id:
+            ct = cleantags(csv_d.tags)
+            fn = csv_d.localcsvfile
+            jtime = timeconvert(csv_d.created_date)
+            csvify(fn, csv_d.mem_yara_indicators, csv_d.source, jtime, ct, csv_d.notes)
             return send_from_directory(
                     directory=docs, 
                     filename=fn,
@@ -246,10 +294,12 @@ def open_status():
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='open')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='open')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='open')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='open')
     return render_template('open_status_table.html',
     	NBI_ids=NBI_ids,
         NS_ids=NS_ids,
         BY_ids=BY_ids,
+        MY_ids=MY_ids,
     	error=error,
     	username=session['name'],
     	)
@@ -261,6 +311,8 @@ def delete_open_status(open_id):
     NBI_delete_open_status = db.session.query(Network_Bro_Intel_dt)
     NS_delete_open_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_open_status = db.session.query(Binary_Yara_dt)
+    MY_delete_open_status = db.session.query(Memory_Yara_dt)
+
 
     for delete in NBI_delete_open_status:
         if delete.type_hash == hash_id:
@@ -273,6 +325,10 @@ def delete_open_status(open_id):
     for delete in BY_delete_open_status:
         if delete.type_hash == hash_id:
             d = db.session.query(Binary_Yara_dt).filter_by(id=delete.id)
+            d.delete()
+    for delete in MY_delete_open_status:
+        if delete.type_hash == hash_id:
+            d = db.session.query(Memory_Yara_dt).filter_by(id=delete.id)
             d.delete()
 
     db.session.commit()
@@ -288,6 +344,7 @@ def edit_open_status(open_id):
     NBI_edit_open_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_open_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_open_status = db.session.query(Binary_Yara_dt)
+    MY_edit_open_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_open_status:
         if edit.type_hash == hash_id:
@@ -375,7 +432,7 @@ def edit_open_status(open_id):
                 )
     for edit in BY_edit_open_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -386,7 +443,50 @@ def edit_open_status(open_id):
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.yara_indicators = []
+                    d_obj.bin_yara_indicators = []
+                d_obj.notes = form.notes.data
+                d_obj.priority = form.priority.data
+                d_obj.status = form.status.data
+                d_obj.str_tags = form.strtags.data      
+                if d_obj.status == 'reviewing':
+                    d_obj.in_review_by = session['name']
+                elif d_obj.status == 'vetted':
+                    d_obj.vetted_by = session['name']
+                elif d_obj.status == 'stale':
+                    d_obj.stale_by = session['name']
+                try:
+                    db.session.commit()
+                    flash('The entry was successfully updated.')
+                    return redirect(url_for('status.open_status'))
+
+                except IntegrityError:
+                    error = 'Sorry, that source name already exists.'
+                    return render_template('edit_dt_form.html', 
+                        form=form, 
+                        error=error, 
+                        username=session['name'], 
+                        e=e
+                    )
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                )
+    for edit in MY_edit_open_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if request.method == 'POST':
+                d_obj = Memory_Yara_dt.query.get(edit.id)
+                if form.newlinei.data:
+                    d_obj.newline_indicators = form.newlinei.data
+                else:
+                    d_obj.mem_yara_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -417,7 +517,6 @@ def edit_open_status(open_id):
                 e=edit,
                 )
 
-
      ###############
      ## REVIEWING ##
      ###############
@@ -429,10 +528,12 @@ def reviewing_status():
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='reviewing')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='reviewing')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='reviewing')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='reviewing')
     return render_template('reviewing_status_table.html',
         NBI_ids=NBI_ids,
         NS_ids=NS_ids,
         BY_ids=BY_ids,
+        MY_ids=MY_ids,
         error=error,
         username=session['name'],
         )
@@ -445,6 +546,7 @@ def delete_reviewing_status(reviewing_id):
     NBI_delete_reviewing_status = db.session.query(Network_Bro_Intel_dt)
     NS_delete_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_reviewing_status = db.session.query(Binary_Yara_dt)
+    MY_delete_reviewing_status = db.session.query(Memory_Yara_dt)
 
     for delete in NBI_delete_reviewing_status:
         if delete.type_hash == hash_id:
@@ -457,6 +559,10 @@ def delete_reviewing_status(reviewing_id):
     for delete in BY_delete_reviewing_status:
         if delete.type_hash == hash_id:
             d = db.session.query(Binary_Yara_dt).filter_by(id=delete.id)
+            d.delete()
+    for delete in MY_delete_reviewing_status:
+        if delete.type_hash == hash_id:
+            d = db.session.query(Memory_Yara_dt).filter_by(id=delete.id)
             d.delete()
 
     db.session.commit()
@@ -471,6 +577,7 @@ def edit_reviewing_button_status(reviewing_id):
     NBI_edit_reviewing_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_reviewing_status = db.session.query(Binary_Yara_dt)
+    MY_edit_reviewing_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_reviewing_status:
         if edit.type_hash == hash_id:
@@ -516,7 +623,28 @@ def edit_reviewing_button_status(reviewing_id):
             )
     for edit in BY_edit_reviewing_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if edit.status == 'open':
+                edit.status = 'reviewing'
+                edit.in_review_by = session['name']
+                db.session.commit()
+                flash("status updated to 'reviewing'")
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                strtags=strtags,
+                newlinei=newlinei,
+            )
+    for edit in MY_edit_reviewing_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -543,6 +671,7 @@ def edit_reviewing_status(reviewing_id):
     NBI_edit_reviewing_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_reviewing_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_reviewing_status = db.session.query(Binary_Yara_dt)
+    MY_edit_reviewing_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_reviewing_status:
         if edit.type_hash == hash_id:
@@ -630,7 +759,7 @@ def edit_reviewing_status(reviewing_id):
                 )
     for edit in BY_edit_reviewing_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -641,7 +770,50 @@ def edit_reviewing_status(reviewing_id):
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.yara_indicators = []
+                    d_obj.bin_yara_indicators = []
+                d_obj.notes = form.notes.data
+                d_obj.priority = form.priority.data
+                d_obj.status = form.status.data
+                d_obj.str_tags = form.strtags.data      
+                if d_obj.status == 'reviewing':
+                    d_obj.in_review_by = session['name']
+                elif d_obj.status == 'vetted':
+                    d_obj.vetted_by = session['name']
+                elif d_obj.status == 'stale':
+                    d_obj.stale_by = session['name']
+                try:
+                    db.session.commit()
+                    flash('The entry was successfully updated.')
+                    return redirect(url_for('status.reviewing_status'))
+
+                except IntegrityError:
+                    error = 'Sorry, that source name already exists.'
+                    return render_template('edit_dt_form.html', 
+                        form=form, 
+                        error=error, 
+                        username=session['name'], 
+                        e=e
+                    )
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                )
+    for edit in MY_edit_reviewing_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if request.method == 'POST':
+                d_obj = Memory_Yara_dt.query.get(edit.id)
+                if form.newlinei.data:
+                    d_obj.newline_indicators = form.newlinei.data
+                else:
+                    d_obj.mem_yara_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -672,7 +844,6 @@ def edit_reviewing_status(reviewing_id):
                 e=edit,
                 )
 
-
      ############
      ## VETTED ##
      ############
@@ -684,10 +855,13 @@ def vetted_status():
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='vetted')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='vetted')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='vetted')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='vetted')
+
     return render_template('vetted_status_table.html',
         NBI_ids=NBI_ids,
         NS_ids=NS_ids,
         BY_ids=BY_ids,
+        MY_ids=MY_ids,
         error=error,
         username=session['name'],
         )
@@ -700,6 +874,7 @@ def delete_vetted_status(vetted_id):
     NBI_delete_vetted_status = db.session.query(Network_Bro_Intel_dt)
     NS_delete_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_vetted_status = db.session.query(Binary_Yara_dt)
+    MY_delete_vetted_status = db.session.query(Memory_Yara_dt)
 
     for delete in NBI_delete_vetted_status:
         if delete.type_hash == hash_id:
@@ -712,6 +887,10 @@ def delete_vetted_status(vetted_id):
     for delete in BY_delete_vetted_status:
         if delete.type_hash == hash_id:
             d = db.session.query(Binary_Yara_dt).filter_by(id=delete.id)
+            d.delete()
+    for delete in MY_delete_vetted_status:
+        if delete.type_hash == hash_id:
+            d = db.session.query(Memory_Yara_dt).filter_by(id=delete.id)
             d.delete()
 
     db.session.commit()
@@ -727,6 +906,7 @@ def edit_vetted_status(vetted_id):
     NBI_edit_vetted_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_vetted_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_vetted_status = db.session.query(Binary_Yara_dt)
+    MY_edit_vetted_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_vetted_status:
         if edit.type_hash == hash_id:
@@ -814,7 +994,7 @@ def edit_vetted_status(vetted_id):
                 )
     for edit in BY_edit_vetted_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -825,7 +1005,50 @@ def edit_vetted_status(vetted_id):
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.yara_indicators = []
+                    d_obj.bin_yara_indicators = []
+                d_obj.notes = form.notes.data
+                d_obj.priority = form.priority.data
+                d_obj.status = form.status.data
+                d_obj.str_tags = form.strtags.data      
+                if d_obj.status == 'reviewing':
+                    d_obj.in_review_by = session['name']
+                elif d_obj.status == 'vetted':
+                    d_obj.vetted_by = session['name']
+                elif d_obj.status == 'stale':
+                    d_obj.stale_by = session['name']
+                try:
+                    db.session.commit()
+                    flash('The entry was successfully updated.')
+                    return redirect(url_for('status.vetted_status'))
+
+                except IntegrityError:
+                    error = 'Sorry, that source name already exists.'
+                    return render_template('edit_dt_form.html', 
+                        form=form, 
+                        error=error, 
+                        username=session['name'], 
+                        e=e
+                    )
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                )
+    for edit in MY_edit_vetted_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if request.method == 'POST':
+                d_obj = Memory_Yara_dt.query.get(edit.id)
+                if form.newlinei.data:
+                    d_obj.newline_indicators = form.newlinei.data
+                else:
+                    d_obj.mem_yara_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -856,7 +1079,6 @@ def edit_vetted_status(vetted_id):
                 e=edit,
                 )
 
-
     ###########
     ## STALE ##
     ###########
@@ -868,10 +1090,12 @@ def stale_status():
     NBI_ids = db.session.query(Network_Bro_Intel_dt).filter_by(status='stale')
     NS_ids = db.session.query(Network_Snort_Suricata_dt).filter_by(status='stale')
     BY_ids = db.session.query(Binary_Yara_dt).filter_by(status='stale')
+    MY_ids = db.session.query(Memory_Yara_dt).filter_by(status='stale')
     return render_template('stale_status_table.html',
         NBI_ids=NBI_ids,
         NS_ids=NS_ids,
         BY_ids=BY_ids,
+        MY_ids=MY_ids,
         error=error,
         username=session['name'],
         )
@@ -884,6 +1108,7 @@ def delete_stale_status(stale_id):
     NBI_delete_stale_status = db.session.query(Network_Bro_Intel_dt)
     NS_delete_stale_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_stale_status = db.session.query(Binary_Yara_dt)
+    MY_delete_stale_status = db.session.query(Memory_Yara_dt)
 
     for delete in NBI_delete_stale_status:
         if delete.type_hash == hash_id:
@@ -896,6 +1121,10 @@ def delete_stale_status(stale_id):
     for delete in BY_delete_stale_status:
         if delete.type_hash == hash_id:
             d = db.session.query(Binary_Yara_dt).filter_by(id=delete.id)
+            d.delete()
+    for delete in MY_delete_stale_status:
+        if delete.type_hash == hash_id:
+            d = db.session.query(Memory_Yara_dt).filter_by(id=delete.id)
             d.delete()
 
     db.session.commit()
@@ -911,6 +1140,7 @@ def edit_stale_status(stale_id):
     NBI_edit_stale_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_stale_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_stale_status = db.session.query(Binary_Yara_dt)
+    MY_edit_stale_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_stale_status:
         if edit.type_hash == hash_id:
@@ -998,7 +1228,7 @@ def edit_stale_status(stale_id):
                 )
     for edit in BY_edit_stale_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -1009,7 +1239,50 @@ def edit_stale_status(stale_id):
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.yara_indicators = []
+                    d_obj.bin_yara_indicators = []
+                d_obj.notes = form.notes.data
+                d_obj.priority = form.priority.data
+                d_obj.status = form.status.data
+                d_obj.str_tags = form.strtags.data      
+                if d_obj.status == 'reviewing':
+                    d_obj.in_review_by = session['name']
+                elif d_obj.status == 'vetted':
+                    d_obj.vetted_by = session['name']
+                elif d_obj.status == 'stale':
+                    d_obj.stale_by = session['name']
+                try:
+                    db.session.commit()
+                    flash('The entry was successfully updated.')
+                    return redirect(url_for('status.stale_status'))
+
+                except IntegrityError:
+                    error = 'Sorry, that source name already exists.'
+                    return render_template('edit_dt_form.html', 
+                        form=form, 
+                        error=error, 
+                        username=session['name'], 
+                        e=e
+                    )
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                )
+    for edit in MY_edit_stale_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if request.method == 'POST':
+                d_obj = Memory_Yara_dt.query.get(edit.id)
+                if form.newlinei.data:
+                    d_obj.newline_indicators = form.newlinei.data
+                else:
+                    d_obj.mem_yara_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data
@@ -1040,7 +1313,6 @@ def edit_stale_status(stale_id):
                 e=edit,
                 )
 
-
     #########
     ## ALL ##
     #########
@@ -1052,10 +1324,12 @@ def all_status():
     NBI_ids = db.session.query(Network_Bro_Intel_dt)
     NS_ids = db.session.query(Network_Snort_Suricata_dt)
     BY_ids = db.session.query(Binary_Yara_dt)
+    MY_ids = db.session.query(Memory_Yara_dt)
     return render_template('all_status_table.html',
         NBI_ids=NBI_ids,
         NS_ids=NS_ids,
         BY_ids=BY_ids,
+        MY_ids=MY_ids,
         error=error,
         username=session['name'],
         )
@@ -1068,6 +1342,7 @@ def delete_all_status(all_id):
     NBI_delete_all_status = db.session.query(Network_Bro_Intel_dt)
     NS_delete_all_status = db.session.query(Network_Snort_Suricata_dt)
     BY_delete_all_status = db.session.query(Binary_Yara_dt)
+    MY_delete_all_status = db.session.query(Memory_Yara_dt)
 
     for delete in NBI_delete_all_status:
         if delete.type_hash == hash_id:
@@ -1080,6 +1355,10 @@ def delete_all_status(all_id):
     for delete in BY_delete_all_status:
         if delete.type_hash == hash_id:
             d = db.session.query(Binary_Yara_dt).filter_by(id=delete.id)
+            d.delete()
+    for delete in MY_delete_all_status:
+        if delete.type_hash == hash_id:
+            d = db.session.query(Memory_Yara_dt).filter_by(id=delete.id)
             d.delete()
 
     db.session.commit()
@@ -1095,6 +1374,7 @@ def edit_all_status(all_id):
     NBI_edit_all_status = db.session.query(Network_Bro_Intel_dt)
     NS_edit_all_status = db.session.query(Network_Snort_Suricata_dt)
     BY_edit_all_status = db.session.query(Binary_Yara_dt)
+    MY_edit_all_status = db.session.query(Memory_Yara_dt)
 
     for edit in NBI_edit_all_status:
         if edit.type_hash == hash_id:
@@ -1182,7 +1462,7 @@ def edit_all_status(all_id):
                 )
     for edit in BY_edit_all_status:
         if edit.type_hash == hash_id:
-            newlinei = ''.join(edit.yara_indicators)
+            newlinei = ''.join(edit.bin_yara_indicators)
             strtags = listtostring(edit.tags)
             form = EditScrape(obj=edit,
                         strtags=strtags,
@@ -1193,7 +1473,50 @@ def edit_all_status(all_id):
                 if form.newlinei.data:
                     d_obj.newline_indicators = form.newlinei.data
                 else:
-                    d_obj.yara_indicators = []
+                    d_obj.bin_yara_indicators = []
+                d_obj.notes = form.notes.data
+                d_obj.priority = form.priority.data
+                d_obj.status = form.status.data
+                d_obj.str_tags = form.strtags.data      
+                if d_obj.status == 'reviewing':
+                    d_obj.in_review_by = session['name']
+                elif d_obj.status == 'vetted':
+                    d_obj.vetted_by = session['name']
+                elif d_obj.status == 'stale':
+                    d_obj.stale_by = session['name']
+                try:
+                    db.session.commit()
+                    flash('The entry was successfully updated.')
+                    return redirect(url_for('status.all_status'))
+
+                except IntegrityError:
+                    error = 'Sorry, that source name already exists.'
+                    return render_template('edit_dt_form.html', 
+                        form=form, 
+                        error=error, 
+                        username=session['name'], 
+                        e=e
+                    )
+            return render_template('edit_dt_form.html', 
+                form=form, 
+                error=error, 
+                username=session['name'], 
+                e=edit,
+                )
+    for edit in MY_edit_all_status:
+        if edit.type_hash == hash_id:
+            newlinei = ''.join(edit.mem_yara_indicators)
+            strtags = listtostring(edit.tags)
+            form = EditScrape(obj=edit,
+                        strtags=strtags,
+                        newlinei=newlinei,
+                        )
+            if request.method == 'POST':
+                d_obj = Memory_Yara_dt.query.get(edit.id)
+                if form.newlinei.data:
+                    d_obj.newline_indicators = form.newlinei.data
+                else:
+                    d_obj.mem_yara_indicators = []
                 d_obj.notes = form.notes.data
                 d_obj.priority = form.priority.data
                 d_obj.status = form.status.data

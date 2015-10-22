@@ -27,6 +27,9 @@
   <label class="btn btn-primary active" id="BY">
     <input type="checkbox" autocomplete="off"> Binary - Yara
   </label>
+  <label class="btn btn-primary active" id="MY">
+    <input type="checkbox" autocomplete="off"> Memory - Yara
+  </label>
 </div>
 <br>
 
@@ -58,11 +61,11 @@
           {% endfor %}
         </td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -114,11 +117,11 @@
           {% endfor %}
         </td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -142,7 +145,7 @@
   </div>
 </div>
 
-<div class="row" id="yara_div">
+<div class="row" id="bin_yara_div">
   <h3>Binary -<small> YARA</small></h3>
   <div class="entries">
   <div class="table-responsive">
@@ -170,11 +173,67 @@
           {% endfor %}
         </td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
+          <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
+          {% endif %}
+        </td>
+        <td align="center">
+          <br>
+            {% if o.status == 'open' %}
+            <a class="btn btn-success" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_reviewing_button_status', reviewing_id = o.type_hash) }}">Review</a>
+            {% endif %}
+            {% if session.role == "admin" %}
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_vetted_status', vetted_id = o.type_hash) }}">Edit</a>
+            <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('status.delete_vetted_status', vetted_id = o.type_hash) }}">Delete</a>
+            {% else %}
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.view_status', view_id = o.type_hash) }}">View</a>
+            {% endif %}
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<div class="row" id="mem_yara_div">
+  <h3>Memory -<small> YARA</small></h3>
+  <div class="entries">
+  <div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr class="active">
+        <th width="8%">date/time UTC</th>
+        <th width="10%">status</th>
+        <th width="25%">source</th>
+        <th width="15%">tags</th>
+        <th width="8%">priority</th>
+        <th width="16%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    {% for o in MY_ids %}
+      <tr>
+        <td>{{ o.created_date }}</td>
+        <td>{{ o.status }}</td>
+        <td class='info'><pre><code>{{ o.source }}</code></pre></td>
+        <td>
+          {% for t in o.tags %}
+          <span class="label label-primary">{{ t }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          {% if o.priority == '2' %}
+          <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
+          {% elif o.priority == '1' %}
+          <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -226,7 +285,19 @@ button.onclick = function() {
 var button = document.getElementById('BY'); 
 
 button.onclick = function() {
-    var div = document.getElementById('yara_div');
+    var div = document.getElementById('bin_yara_div');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+
+var button = document.getElementById('MY'); 
+
+button.onclick = function() {
+    var div = document.getElementById('mem_yara_div');
     if (div.style.display !== 'none') {
         div.style.display = 'none';
     }

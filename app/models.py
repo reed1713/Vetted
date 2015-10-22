@@ -36,7 +36,7 @@ class Network_Bro_Intel_dt(db.Model):
     in_review_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     vetted_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     stale_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
-    priority = db.Column(db.String, default='medium')
+    priority = db.Column(db.Integer, default=3)
     status = db.Column(db.String, default='open')
 
     def __init__(self,
@@ -165,7 +165,7 @@ class Network_Snort_Suricata_dt(db.Model):
     in_review_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     vetted_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     stale_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
-    priority = db.Column(db.String, default='medium')
+    priority = db.Column(db.Integer, default=3)
     status = db.Column(db.String, default='open')
 
     def __init__(self,
@@ -275,7 +275,7 @@ class Binary_Yara_dt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type_hash = db.Column(db.String, unique=True)
     source = db.Column(db.String)
-    yara_indicators = db.Column(JSON)
+    bin_yara_indicators = db.Column(JSON)
     d_type = db.Column(db.String)
     tags = db.relationship('Tag', secondary=lambda: Byara_tags_relation_table)
     notes = db.Column(db.String)
@@ -287,13 +287,13 @@ class Binary_Yara_dt(db.Model):
     in_review_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     vetted_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     stale_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
-    priority = db.Column(db.String, default='medium')
+    priority = db.Column(db.Integer, default=3)
     status = db.Column(db.String, default='open')
 
     def __init__(self,
         type_hash = None,
         source = None, 
-        yara_indicators = None,
+        bin_yara_indicators = None,
         d_type = 'Binary - Yara',
         tags = None,
         notes = None,
@@ -311,7 +311,7 @@ class Binary_Yara_dt(db.Model):
 
         self.type_hash = type_hash
         self.source = source
-        self.yara_indicators = yara_indicators
+        self.bin_yara_indicators = bin_yara_indicators
         self.d_type = d_type
         self.tags = tags
         self.notes = notes
@@ -372,7 +372,7 @@ class Binary_Yara_dt(db.Model):
 
     def _get_i(self):
 
-        return self.yara_indicators
+        return self.bin_yara_indicators
 
     def _set_i(self, value):
 
@@ -383,7 +383,7 @@ class Binary_Yara_dt(db.Model):
 
         out = json.dumps(final)
         newout = json.loads(out)
-        self.yara_indicators = newout
+        self.bin_yara_indicators = newout
 
     newline_indicators = property(_get_i, 
                                   _set_i, 
@@ -397,7 +397,7 @@ class Memory_Yara_dt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type_hash = db.Column(db.String, unique=True)
     source = db.Column(db.String)
-    yara_indicators = db.Column(JSON)
+    mem_yara_indicators = db.Column(JSON)
     d_type = db.Column(db.String)
     tags = db.relationship('Tag', secondary=lambda: Myara_tags_relation_table)
     notes = db.Column(db.String)
@@ -409,13 +409,13 @@ class Memory_Yara_dt(db.Model):
     in_review_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     vetted_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
     stale_by = db.Column(db.String, db.ForeignKey('users.name', ondelete='SET NULL'))
-    priority = db.Column(db.String, default='medium')
+    priority = db.Column(db.Integer, default=3)
     status = db.Column(db.String, default='open')
 
     def __init__(self,
         type_hash = None,
         source = None, 
-        yara_indicators = None,
+        mem_yara_indicators = None,
         d_type = 'Memory - Yara',
         tags = None,
         notes = None,
@@ -433,7 +433,7 @@ class Memory_Yara_dt(db.Model):
 
         self.type_hash = type_hash
         self.source = source
-        self.yara_indicators = yara_indicators
+        self.mem_yara_indicators = mem_yara_indicators
         self.d_type = d_type
         self.tags = tags
         self.notes = notes
@@ -494,7 +494,7 @@ class Memory_Yara_dt(db.Model):
 
     def _get_i(self):
 
-        return self.yara_indicators
+        return self.mem_yara_indicators
 
     def _set_i(self, value):
 
@@ -505,7 +505,7 @@ class Memory_Yara_dt(db.Model):
 
         out = json.dumps(final)
         newout = json.loads(out)
-        self.yara_indicators = newout
+        self.mem_yara_indicators = newout
 
     newline_indicators = property(_get_i, 
                                   _set_i, 

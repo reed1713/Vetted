@@ -28,7 +28,7 @@ The idea behind this project is to create a simple indicator management app that
 
 ### Detection types
 
-Supported detection types: 'Bro Intel', 'Snort_Suricata', 'Yara'.
+Supported detection types: 'Bro Intel', 'Snort_Suricata', 'Yara Binary', 'Yara Memory'.
 
 ### API clients
 
@@ -56,7 +56,6 @@ Getting this spun up is a manual process. For more info check out the INSTALL do
 ![editintel](./screens/editintel.png)
 
 ### To do:
-- add "memory - yara" detection object
 - yara bin/mem api client
 - more research modules
 - task queue

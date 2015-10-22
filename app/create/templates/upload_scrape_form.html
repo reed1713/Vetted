@@ -1,4 +1,4 @@
-<!--app/scrape/templates/upload_scrape_form.html-->
+<!--app/create/templates/upload_create_form.html-->
 
 {% extends "template.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
@@ -10,17 +10,18 @@
 </div>
 
 <ul class="nav nav-tabs">
-  <li role="presentation"><a href="{{ url_for('scrape.scrape') }}">Url</a></li>
-  <li role="presentation" class="active"><a href="{{ url_for('scrape.upload_scrape') }}">Upload</a></li>
+  <li role="presentation"><a href="{{ url_for('create.create') }}">Url</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('create.upload_create') }}">Upload</a></li>
 </ul>
 
-<form action="{{ url_for('scrape.upload_scrape') }}" method="post" enctype="multipart/form-data">
+<form action="{{ url_for('create.upload_create') }}" method="post" enctype="multipart/form-data">
 <div class="lead"></div>
   {{ form.csrf_token }}
   <p> 
     {{ form.N_BI_checkbx }} Network - Bro Intel &nbsp;
     {{ form.N_S_checkbx }} Network - Snort/Suricata &nbsp;
     {{ form.B_Y_checkbx }} Binary - Yara &nbsp;
+    {{ form.M_Y_checkbx }} Memory - Yara &nbsp;
   </p>
 
     {{ wtf.form_field(form.source, placeholder="source") }}
@@ -31,7 +32,7 @@
 
     {{ wtf.form_field(form.priority) }}
 
-  <input class="btn btn-md btn-info" type="submit" value="Scrape">
+  <input class="btn btn-md btn-info" type="submit" value="create">
 
 </form>
 
@@ -46,7 +47,7 @@
   {% endif %}
   {% if nbi_out %}
   <a class="list-group-item">
-    <h4 class="list-group-item-heading">Scraped Bro_Intel indicators:</h4>
+    <h4 class="list-group-item-heading">created Bro_Intel indicators:</h4>
     <p class="list-group-item-text">{{ nbi_out }}</p>
   </a>
   {% endif %}

@@ -27,6 +27,9 @@
   <label class="btn btn-primary active" id="BY">
     <input type="checkbox" autocomplete="off"> Binary - Yara
   </label>
+  <label class="btn btn-primary active" id="MY">
+    <input type="checkbox" autocomplete="off"> Memory - Yara
+  </label>
 </div>
 <br>
 
@@ -52,11 +55,11 @@
         <td>{{ o.in_review_by }}</td>
         <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -97,11 +100,11 @@
         <td>{{ o.in_review_by }}</td>
         <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -120,7 +123,7 @@
   </div>
 </div>
 
-<div class="row" id="yara_div">
+<div class="row" id="bin_yara_div">
   <h3>Binary -<small> YARA</small></h3>
   <div class="entries">
   <div class="table-responsive">
@@ -142,11 +145,56 @@
         <td>{{ o.in_review_by }}</td>
         <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
         <td>
-          {% if o.priority == 'medium' %}
+          {% if o.priority == '2' %}
           <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'high' %}
+          {% elif o.priority == '1' %}
           <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
-          {% elif o.priority == 'low' %}
+          {% elif o.priority == '3' %}
+          <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
+          {% endif %}
+        </td>
+        <td align="center">
+          <br>
+            <a class="btn btn-info" name="openbuttons" id="openbuttons" href="{{ url_for('status.edit_reviewing_status', reviewing_id = o.type_hash) }}">Edit</a>
+            {% if session.role == "admin" %}
+            <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('status.delete_reviewing_status', reviewing_id = o.type_hash) }}">Delete</a>
+            {% endif %}
+    {% endfor %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  </div>
+</div>
+
+<div class="row" id="yara_div">
+  <h3>Memory -<small> YARA</small></h3>
+  <div class="entries">
+  <div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr class="active">
+        <th width="8%">date/time UTC</th>
+        <th width="10%">reviewing</th>
+        <th width="25%">source</th>
+        <th width="8%">priority</th>
+        <th width="8%">options</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    {% for o in MY_ids %}
+      <tr>
+        <td>{{ o.created_date }}</td>
+        <td>{{ o.in_review_by }}</td>
+        <td class='danger'><pre><code>{{ o.source }}</code></pre></td>
+        <td>
+          {% if o.priority == '2' %}
+          <h3 align="center"><span class="label label-warning">{{ o.priority }}</span></h3>
+          {% elif o.priority == '1' %}
+          <h3 align="center"><span class="label label-danger">{{ o.priority }}</span></h3>
+          {% elif o.priority == '3' %}
           <h3 align="center"><span class="label label-success">{{ o.priority }}</span></h3>
           {% endif %}
         </td>
@@ -193,7 +241,19 @@ button.onclick = function() {
 var button = document.getElementById('BY'); 
 
 button.onclick = function() {
-    var div = document.getElementById('yara_div');
+    var div = document.getElementById('bin_yara_div');
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+    }
+    else {
+        div.style.display = 'block';
+    }
+};
+
+var button = document.getElementById('MY'); 
+
+button.onclick = function() {
+    var div = document.getElementById('mem_yara_div');
     if (div.style.display !== 'none') {
         div.style.display = 'none';
     }

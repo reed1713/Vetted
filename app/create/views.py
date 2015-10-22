@@ -1,11 +1,11 @@
-# app/scrape/views.py
+# app/create/views.py
 
 from flask import flash, redirect, render_template, request, session, url_for, Blueprint
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
-from app.scrape.forms import URLScrape, UploadScrape, Manual
+from app.create.forms import URLScrape, UploadScrape, Manual
 from app import db, docs
 from app.views import login_required, clean_NBI
-from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Tag
+from app.models import Network_Bro_Intel_dt, Network_Snort_Suricata_dt, Binary_Yara_dt, Memory_Yara_dt, Tag
 from werkzeug import secure_filename
 
 #local helper methods
@@ -25,6 +25,18 @@ import re
 NBI_HASH_STRING = 'network_bro_intel'
 NS_HASH_STRING = 'network_snort_suricata'
 BY_HASH_STRING = 'binary_yara'
+MY_HASH_STRING = 'memory_yara'
+
+################
+#### config ####
+################
+
+create_blueprint = Blueprint(
+    'create', __name__,
+    url_prefix='/create',
+    template_folder='templates',
+    static_folder='static'
+)
 
 ################
 #### helper ####
@@ -66,24 +78,14 @@ def yara_sig_to_list(listofsigs):
 def hash_type(dt_type, source):
     return hashlib.md5(dt_type + source).hexdigest()
 
-################
-#### config ####
-################
-
-scrape_blueprint = Blueprint(
-    'scrape', __name__,
-    url_prefix='/scrape',
-    template_folder='templates',
-    static_folder='static'
-)
 
 ################
 #### routes ####
 ################
 
-@scrape_blueprint.route('/auto/', methods=['GET', 'POST'])
+@create_blueprint.route('/auto/', methods=['GET', 'POST'])
 @login_required
-def scrape():
+def create():
     error = None
     form = URLScrape(request.form)
     if request.method == 'POST':
@@ -161,7 +163,7 @@ def scrape():
             localtxtfile = txtfile,
             localcsvfile = csvfile,
             tags = [],
-            yara_indicators=[],
+            bin_yara_indicators=[],
             )
             result.str_tags = ktags
             try:
@@ -171,6 +173,27 @@ def scrape():
             except IntegrityError:
                 db.session.rollback()
                 error_by = "source and binary-yara detection type object already exists."
+                error.append(error_by)
+        if form.M_Y_checkbx.data == True:
+            result = Memory_Yara_dt(
+            source = cleaned_url,
+            type_hash = hash_type(MY_HASH_STRING, cleaned_url),
+            priority = form.priority.data,
+            created_by = session['name'],
+            localfile = filename,
+            localtxtfile = txtfile,
+            localcsvfile = csvfile,
+            tags = [],
+            mem_yara_indicators=[],
+            )
+            result.str_tags = ktags
+            try:
+                db.session.add(result)
+                db.session.commit()
+                flash('successfully created memory-yara detection object')
+            except IntegrityError:
+                db.session.rollback()
+                error_by = "source and memory-yara detection type object already exists."
                 error.append(error_by)
 
         if form.N_BI_checkbx.data == True:
@@ -194,9 +217,9 @@ def scrape():
                 error=error,
                 )
 
-@scrape_blueprint.route('/upload/', methods=['POST', 'GET'])
+@create_blueprint.route('/upload/', methods=['POST', 'GET'])
 @login_required
-def upload_scrape():
+def upload_create():
     DOCS = 'app/documents/'
     error = None
     form = UploadScrape(request.form)
@@ -280,7 +303,7 @@ def upload_scrape():
                 localtxtfile = txtfile,
                 localcsvfile = csvfile,
                 tags = [],
-                yara_indicators=[]
+                bin_yara_indicators=[]
                 )
                 result.str_tags = ktags
                 try:
@@ -290,6 +313,27 @@ def upload_scrape():
                 except IntegrityError:
                     db.session.rollback()
                     error_by = "source and binary-yara detection type object already exists."
+                    error.append(error_by)
+            if form.M_Y_checkbx.data == True:
+                result = Memory_Yara_dt(
+                source = cleansourcename,
+                type_hash = hash_type(MY_HASH_STRING, cleansourcename),
+                priority = form.priority.data,
+                created_by = session['name'],
+                localfile = cleansource,
+                localtxtfile = txtfile,
+                localcsvfile = csvfile,
+                tags = [],
+                mem_yara_indicators=[]
+                )
+                result.str_tags = ktags
+                try:
+                    db.session.add(result)
+                    db.session.commit()
+                    flash('successfully created memory-yara detection object')
+                except IntegrityError:
+                    db.session.rollback()
+                    error_by = "source and memory-yara detection type object already exists."
                     error.append(error_by)
 
             if form.N_BI_checkbx.data == True:
@@ -320,7 +364,7 @@ def upload_scrape():
                             username=session['name'],
                             )
 
-@scrape_blueprint.route('/manual/network_bro_intel/', methods=['GET', 'POST'])
+@create_blueprint.route('/manual/network_bro_intel/', methods=['GET', 'POST'])
 @login_required
 def manual_NBI():
     error = None
@@ -335,7 +379,7 @@ def manual_NBI():
         cleansourcename = cleanUrl(form.source.data)
         indicators = tolistofdicts(form.newlinei.data)
         filename = downloadedFilename(cleansourcename)
-        if indicators == None:
+        if indicators == [u'']:
             indicators = []
         result = Network_Bro_Intel_dt(
             type_hash = hash_type(NBI_HASH_STRING, cleansourcename),
@@ -353,7 +397,7 @@ def manual_NBI():
             db.session.add(result)
             db.session.commit()
             flash('successfully created network-bro_intel detection object')
-            return redirect(url_for('scrape.manual_NBI'))
+            return redirect(url_for('create.manual_NBI'))
         except IntegrityError:
             error = 'source and network-bro_intel detection type object already exists.'
             return render_template('manual_NBI.html', 
@@ -362,7 +406,7 @@ def manual_NBI():
                 username=session['name'],
             )
 
-@scrape_blueprint.route('/manual/network_snort_suricata/', methods=['GET', 'POST'])
+@create_blueprint.route('/manual/network_snort_suricata/', methods=['GET', 'POST'])
 @login_required
 def manual_NS():
     error = None
@@ -377,7 +421,8 @@ def manual_NS():
         cleansourcename = cleanUrl(form.source.data)
         indicators = snort_suricata_sig_to_list(form.newlinei.data)
         filename = downloadedFilename(cleansourcename)
-        if indicators == None:
+        print indicators
+        if indicators == [u'']:
             indicators = []
         result = Network_Snort_Suricata_dt(
             type_hash = hash_type(NS_HASH_STRING, cleansourcename),
@@ -395,7 +440,7 @@ def manual_NS():
             db.session.add(result)
             db.session.commit()
             flash('successfully created network-snort_suricata detection object')
-            return redirect(url_for('scrape.manual_NS'))
+            return redirect(url_for('create.manual_NS'))
         except IntegrityError:
             error = 'source and network-snort_suricata detection type object already exists.'
             return render_template('manual_NS.html', 
@@ -404,7 +449,7 @@ def manual_NS():
                 username=session['name'],
             )
 
-@scrape_blueprint.route('/manual/binary_yara/', methods=['GET', 'POST'])
+@create_blueprint.route('/manual/binary_yara/', methods=['GET', 'POST'])
 @login_required
 def manual_BY():
     error = None
@@ -419,13 +464,13 @@ def manual_BY():
         cleansourcename = cleanUrl(form.source.data)
         indicators = yara_sig_to_list(form.newlinei.data)
         filename = downloadedFilename(cleansourcename)
-        if indicators == None:
+        if indicators == [u'']:
             indicators = []
         result = Binary_Yara_dt(
             type_hash = hash_type(BY_HASH_STRING, cleansourcename),
             status = form.status.data,
             source = cleansourcename,
-            yara_indicators = indicators,
+            bin_yara_indicators = indicators,
             priority = form.priority.data,
             created_by = session['name'],
             tags = [],
@@ -437,10 +482,52 @@ def manual_BY():
             db.session.add(result)
             db.session.commit()
             flash('successfully created binary-yara detection object')
-            return redirect(url_for('scrape.manual_BY'))
+            return redirect(url_for('create.manual_BY'))
         except IntegrityError:
             error = 'source and binary-yara detection type object already exists.'
             return render_template('manual_BY.html', 
+                form=form, 
+                error=error, 
+                username=session['name'],
+            )
+
+@create_blueprint.route('/manual/memory_yara/', methods=['GET', 'POST'])
+@login_required
+def manual_MY():
+    error = None
+    form = Manual(request.form)
+    if request.method == 'GET':
+        return render_template('manual_MY.html', 
+            form=form, 
+            error=error, 
+            username=session['name'], 
+        )
+    if request.method == 'POST':
+        cleansourcename = cleanUrl(form.source.data)
+        indicators = yara_sig_to_list(form.newlinei.data)
+        filename = downloadedFilename(cleansourcename)
+        if indicators == [u'']:
+            indicators = []
+        result = Memory_Yara_dt(
+            type_hash = hash_type(MY_HASH_STRING, cleansourcename),
+            status = form.status.data,
+            source = cleansourcename,
+            mem_yara_indicators = indicators,
+            priority = form.priority.data,
+            created_by = session['name'],
+            tags = [],
+            notes = form.notes.data,
+            localcsvfile = filename + '.csv'
+            )
+        result.str_tags = form.strtags.data
+        try:
+            db.session.add(result)
+            db.session.commit()
+            flash('successfully created memory-yara detection object')
+            return redirect(url_for('create.manual_MY'))
+        except IntegrityError:
+            error = 'source and memory-yara detection type object already exists.'
+            return render_template('manual_MY.html', 
                 form=form, 
                 error=error, 
                 username=session['name'],

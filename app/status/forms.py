@@ -20,6 +20,6 @@ class EditScrape(Form):
         'priority',
         validators=[DataRequired()],
         choices=[
-            ('low', 'low'), ('medium', 'medium'), ('high', 'high')
+            (3, 'low - 1'), (2, 'medium - 2'), (1, 'high - 3')
         ]
     )

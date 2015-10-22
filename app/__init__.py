@@ -27,7 +27,7 @@ toolbar = DebugToolbarExtension(app)
 
 # import blueprints
 from app.users.views import users_blueprint
-from app.scrape.views import scrape_blueprint
+from app.create.views import create_blueprint
 from app.status.views import status_blueprint
 from app.welcome.views import welcome_blueprint
 from app.lists.views import lists_blueprint
@@ -35,7 +35,7 @@ from app.research.views import research_blueprint
 
 # register our blueprints
 app.register_blueprint(users_blueprint)
-app.register_blueprint(scrape_blueprint)
+app.register_blueprint(create_blueprint)
 app.register_blueprint(status_blueprint)
 app.register_blueprint(welcome_blueprint)
 app.register_blueprint(lists_blueprint)

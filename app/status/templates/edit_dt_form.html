@@ -17,6 +17,10 @@
   <div class="page-header">
     <h2>Edit <span class="label label-primary">Binary - Yara</span></h2>
   </div>
+{% elif e.d_type == 'Memory - Yara' %}
+  <div class="page-header">
+    <h2>Edit <span class="label label-danger">Memory - Yara</span></h2>
+  </div>
 {% endif %}
 
 
@@ -75,6 +79,8 @@
         <h4><span class="label label-warning" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n\r\n. Seperate snort_suricata signatures with a single space."><b>Network - Snort/Suricata *</b></span></h4>
         {% elif e.d_type == 'Binary - Yara' %}
         <h4><span class="label label-primary" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n}\r\n\r\n. Seperate yara signatures with a single space."><b>Binary - Yara indicators *</b></span></h4>
+        {% elif e.d_type == 'Memory - Yara' %}
+        <h4><span class="label label-danger" data-toggle="tooltip" data-placement="top" title="Values separated by \r\n}\r\n\r\n. Seperate yara signatures with a single space."><b>Memory - Yara indicators *</b></span></h4>
         {% endif %}
 
         {{ wtf.form_field(form.newlinei, placeholder="indicators") }}

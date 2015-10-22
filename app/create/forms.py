@@ -5,9 +5,10 @@ from wtforms import TextField, FileField, SelectField, TextAreaField, BooleanFie
 from wtforms.validators import DataRequired, Optional
 
 class URLScrape(Form):
-	N_BI_checkbx = BooleanField('Network - Bro Intel', default=True)
+	N_BI_checkbx = BooleanField('Network - Bro Intel', default=False)
 	N_S_checkbx = BooleanField('Network - Snort_Suricata', default=False)
 	B_Y_checkbx = BooleanField('Binary - Yara', default=False)
+	M_Y_checkbx = BooleanField('Memory - Yara', default=False)
 	url = TextField(
 		validators=[DataRequired()],
 		)
@@ -15,13 +16,14 @@ class URLScrape(Form):
 		'priority',
 		validators=[DataRequired()],
 		choices=[
-			('low', 'low'), ('medium', 'medium'), ('high', 'high')
+			(3, 'low - 3'), (2, 'medium - 2'), (1, 'high - 1')
 		]
 	)
 class UploadScrape(Form):
-	N_BI_checkbx = BooleanField('Network - Bro Intel', default=True)
+	N_BI_checkbx = BooleanField('Network - Bro Intel', default=False)
 	N_S_checkbx = BooleanField('Network - Snort_Suricata', default=False)
 	B_Y_checkbx = BooleanField('Binary - Yara', default=False)
+	M_Y_checkbx = BooleanField('Memory - Yara', default=False)
 	uploadpath = FileField(        
 		'upload',
 		)
@@ -33,7 +35,7 @@ class UploadScrape(Form):
 		'priority',
 		validators=[DataRequired()],
 		choices=[
-			('low', 'low'), ('medium', 'medium'), ('high', 'high')
+			(3, 'low - 3'), (2, 'medium - 2'), (1, 'high - 1')
 		]
 	)
 class Manual(Form):
@@ -50,6 +52,6 @@ class Manual(Form):
         'priority',
         validators=[DataRequired()],
         choices=[
-            ('low', 'low'), ('medium', 'medium'), ('high', 'high')
+            (3, 'low - 3'), (2, 'medium - 2'), (1, 'high - 1')
         ]
     )
