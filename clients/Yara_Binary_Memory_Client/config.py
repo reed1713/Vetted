@@ -1,0 +1,10 @@
+PATH_TO_YARA_BINMEM_DIR = '/opt/Vetted/clients/Yara_Binary_Memory_Client'
+PATH_TO_YARA_BIN_RULES = '/opt/cuckoo-modified/data/yara/binaries/vetted_bin.yar'
+PATH_TO_YARA_MEM_RULES = '/opt/cuckoo-modified/data/yara/memory/vetted_mem.yar'
+PATH_TO_CUCKOO = '/opt/cuckoo-modified/cuckoo.py'
+VETTED_SERVER = 'http://192.168.7.115:5000'
+API_KEY = '8e662aee78554f579a24af53ad9b1856'
+#yara imports
+IMPORT_PE = 'import \"pe\"'
+IMPORT_CUCKOO = 'import \"cuckoo\"'
+IMPORT_ELF = 'import \"elf\"'
