@@ -32,7 +32,7 @@ Supported detection types: 'Bro Intel', 'Snort_Suricata', 'Yara Binary', 'Yara M
 
 ### API clients
 
-Bro Intel, Snort_Suricata. (Both tested and working on Security Onion)
+Bro Intel, Snort_Suricata, Yara Memory/Binary. Tested and working on Security Onion and Cuckoo sandbox
 
 ### Installing
 
