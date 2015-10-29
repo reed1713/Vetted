@@ -19,6 +19,7 @@ st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 # change into dir, so cron will log correctly.
 os.chdir(config.PATH_TO_YARA_BINMEM_DIR)
 
+### MEM ###
 def download_vetted_memsigs_json():
 
 	mem_apipath = '/api/vetted/memory_yara/json/'
@@ -52,19 +53,22 @@ def parse_yara_memsigs_sigs():
 		return writelist
 	else:
 		with open('yara_binary_memory_client.log', 'a') as logfile:
-			logfile.write(st + ": no binary yara signatures to download from the vetted server" + "\n")
+			logfile.write(st + ": no memory yara signatures to download from the vetted server" + "\n")
 
 def write_memsigs_to_file():
 
 	out = parse_yara_memsigs_sigs()
 
-	with open(config.PATH_TO_YARA_MEM_RULES, 'w+') as f:
-		f.write("/*\r\n Vetted yara_memory rules \r\n*/\r\n\r\n")
-		f.write(config.IMPORT_PE + "\r\n")
-		f.write(config.IMPORT_ELF + "\r\n")
-		f.write(config.IMPORT_CUCKOO + "\r\n\r\n")
-		f.writelines(out)
+	if out != None:
+		with open(config.PATH_TO_YARA_MEM_RULES, 'w+') as f:
+			f.write("/*\r\n Vetted yara_memory rules \r\n*/\r\n\r\n")
+			f.write(config.IMPORT_PE + "\r\n")
+			f.write(config.IMPORT_ELF + "\r\n")
+			f.write(config.IMPORT_CUCKOO + "\r\n\r\n")
+			f.writelines(out)
+### END ###
 
+### BIN ###
 def download_vetted_binsigs_json():
 
 	bin_apipath = '/api/vetted/binary_yara/json/'
@@ -98,18 +102,20 @@ def parse_yara_binsigs_sigs():
 		return writelist
 	else:
 		with open('yara_binary_memory_client.log', 'a') as logfile:
-			logfile.write(st + ": no binary yara signatures to download from the vetted server" + "\n")	
+			logfile.write(st + ": no binary yara signatures to download from the vetted server" + "\n")
 
 def write_binsigs_to_file():
 
 	out = parse_yara_binsigs_sigs()
 
-	with open(config.PATH_TO_YARA_BIN_RULES, 'w+') as f:
-		f.write("/*\r\n Vetted yara_binary rules \r\n*/\r\n\r\n")
-		f.write(config.IMPORT_PE + "\r\n")
-		f.write(config.IMPORT_ELF + "\r\n")
-		f.write(config.IMPORT_CUCKOO + "\r\n\r\n")
-		f.writelines(out)
+	if out != None:
+		with open(config.PATH_TO_YARA_BIN_RULES, 'w+') as f:
+			f.write("/*\r\n Vetted yara_binary rules \r\n*/\r\n\r\n")
+			f.write(config.IMPORT_PE + "\r\n")
+			f.write(config.IMPORT_ELF + "\r\n")
+			f.write(config.IMPORT_CUCKOO + "\r\n\r\n")
+			f.writelines(out)
+### END ###
 
 def kill_cuckoo_process():
 
@@ -134,7 +140,7 @@ def main():
 
 	if os.path.isfile(config.PATH_TO_CUCKOO):
 		with open('yara_binary_memory_client.log', 'a') as logfile:
-	 		logfile.write(st + ": successfully loaded yara binary/memory rules" + "\n")
+	 		logfile.write(st + ": successfully loaded yara rules" + "\n")
 	 		# remove 'python' from this line if you've made cuckoo.py executable
 	 	proc = subprocess.Popen(['python', config.PATH_TO_CUCKOO], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	 	for line in iter(proc.stderr.readline, b''):
