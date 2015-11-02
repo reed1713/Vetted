@@ -1,4 +1,4 @@
-<!-- /app/users/templates/edit_accounts.html -->
+<!-- /app/admin/templates/edit_accounts.html -->
 
 
 {% extends "template.html" %}
@@ -14,8 +14,8 @@
 </div>
 
 <ul class="nav nav-tabs">
-  <li role="presentation"><a href="{{ url_for('users.register') }}">Create account</a></li>
-  <li role="presentation" class="active"><a href="{{ url_for('users.edit_accounts') }}">Edit accounts</a></li>
+  <li role="presentation"><a href="{{ url_for('admin.register') }}">Create account</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('admin.edit_accounts') }}">Edit accounts</a></li>
 </ul>
 
 <h1>Accounts</h1>
@@ -40,8 +40,8 @@
         <td>{{ u.email }}</td>
         <td>{{ u.role }}</td>
         <td>
-          <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('users.delete_user', user_id = u.id) }}">Delete</a>
-          <a class="btn btn-primary" name="openbuttons" id="openbuttons" href="{{ url_for('users.edit_user', user_id = u.id) }}">Edit</a>
+          <a class="btn btn-danger" name="openbuttons" id="openbuttons" href="{{ url_for('admin.delete_user', user_id = u.id) }}">Delete</a>
+          <a class="btn btn-primary" name="openbuttons" id="openbuttons" href="{{ url_for('admin.edit_user', user_id = u.id) }}">Edit</a>
     {% endfor %}
         </td>
       </tr>

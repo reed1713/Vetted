@@ -1,0 +1,22 @@
+<!-- /app/admin/templates/settings.html -->
+
+
+{% extends "template.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+{% if session.role == "admin" %}
+
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+
+<p>coming soon...</p>
+
+{% endif %}
+{% if session.role == "user" %}
+  <p>NEED TO BE ADMIN</p>
+{% endif %}
+
+{% endblock %}

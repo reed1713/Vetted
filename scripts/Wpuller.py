@@ -73,17 +73,15 @@ def geturlResource(url, folder=DOCPATH):
 def checkfeed(feedsourceurl):
 
     test = feedparser.parse(feedsourceurl).entries
-    if test == []:
-        return 'FAIL'
-    else:
-        for e in test:
-            t = e['title']
-            l = e['link']
-            p = datetime.datetime.fromtimestamp(time.mktime(e['published_parsed']))   
-            if t == [] or l == [] or p == []:
-                return 'FAIL'
-            else:
-                return 'SUCCESS'
+
+    for e in test:
+        t = e['title']
+        l = e['link']
+        p = datetime.datetime.fromtimestamp(time.mktime(e['published_parsed']))   
+        if t == [] or l == [] or p == []:
+            return 'FAIL'
+        else:
+            return 'SUCCESS'
 
 
 #if __name__ == '__main__':

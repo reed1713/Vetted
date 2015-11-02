@@ -27,6 +27,7 @@ table {
     table-layout: fixed;
     word-wrap: break-word;
 }
+
 #priority {
 	width: 125px;
 }
@@ -65,4 +66,41 @@ table {
 }
 #feedsource_type{
 	width: 150px;
+}
+
+footer {
+    background: #292727;
+    margin: 40px 0 0;
+    padding: 20px 0 15px;
+    width: 100%;
+    color: #ccc;
+}
+footer a:link, footer a:visited {
+    color: #ccc;
+    text-decoration: none;
+}
+footer a:hover {
+    color: #ccc;
+    text-decoration: underline;
+}
+#footer-extra {
+    background: #1c1c1c;
+    padding: 10px 0;
+    font-size: 11px;
+    color: #999;
+}
+#footer-extra a:link, #footer-extra a:visited {
+    color: #999;
+    font-weight: bold;
+    text-decoration: none;
+}
+#footer-extra a:hover {
+    color: #ccc;
+    text-decoration: underline;
+}
+.center {
+    text-align: center;
+}
+html {
+    background: #1c1c1c;
 }

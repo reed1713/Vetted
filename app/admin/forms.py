@@ -1,4 +1,4 @@
-#/app/users/forms.py
+#/app/admin/forms.py
 
 
 from flask_wtf import Form
@@ -26,7 +26,3 @@ class RegisterForm(Form):
         'role',
         choices=[('user', 'user'), ('admin', 'admin')]
     )
-
-class LoginForm(Form):
-    name = TextField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])

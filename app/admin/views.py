@@ -1,4 +1,4 @@
-#/app/users/views.py
+#/app/admin/views.py
 
 
 #################
@@ -8,7 +8,7 @@
 from flask import flash, redirect, render_template, request, \
     session, url_for, Blueprint
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
-from forms import RegisterForm, LoginForm
+from forms import RegisterForm
 from app import db, bcrypt
 from app.views import login_required, admin
 from app.models import User
@@ -17,9 +17,9 @@ from app.models import User
 #### config ####
 ################
 
-users_blueprint = Blueprint(
-    'users', __name__,
-    url_prefix='/users',
+admin_blueprint = Blueprint(
+    'admin', __name__,
+    url_prefix='/admin',
     template_folder='templates',
     static_folder='static'
     )
@@ -38,58 +38,36 @@ def generate_apikey():
 #### routes ####
 ################
 
+    ################
+    ### settings ###
+    ################
 
-@users_blueprint.route('/logout/')
+@admin_blueprint.route('/settings/', methods=['GET', 'POST'])
 @login_required
-def logout():
-    session.pop('logged_in', None)
-    session.pop('user_id', None)
-    session.pop('role', None)
-    session.pop('name', None)
-    flash('You are logged out.')
-    return redirect(url_for('users.login'))
+@admin
+def settings():
+    return render_template('settings.html', 
+    username=session['name']
+    )
 
-@users_blueprint.route('/', methods=['GET', 'POST'])
-def login():
-    error = None
-    form = LoginForm(request.form)
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            user = User.query.filter_by(name=request.form['name']).first()
-            if user is None:
-                error = 'Invalid username or password.'
-                return render_template(
-                    "login.html",
-                    form=form,
-                    error=error
-                    )
-            else:
-                pw = bcrypt.check_password_hash(user.password, request.form['password'])
-                if pw == True:
-                    session['logged_in'] = True
-                    session['user_id'] = user.id
-                    session['role'] = user.role
-                    session['name'] = user.name
-                    flash('You are logged in.')
+    ##################
+    ### push rules ###
+    ##################
 
-                    return redirect(url_for('welcome.welcome'))
-                else:
-                    error = 'Invalid username or password.'
-                    return render_template(
-                    "login.html",
-                    form=form,
-                    error=error
-                    )
-        else:
-            return render_template(
-                "login.html",
-                form=form,
-                error=error
-                )
-    if request.method == 'GET':
-        return render_template('login.html', form=form)
+@admin_blueprint.route('/push_rules/', methods=['GET', 'POST'])
+@login_required
+@admin
+def push_rules():
+    return render_template('push_rules.html', 
+    username=session['name']
+    )
 
-@users_blueprint.route('/register/', methods=['GET', 'POST'])
+
+    ####################
+    ### manage users ###
+    ####################
+
+@admin_blueprint.route('/register/', methods=['GET', 'POST'])
 @login_required
 @admin
 def register():
@@ -130,7 +108,7 @@ def register():
             username=session['name']
             )
 
-@users_blueprint.route('/edit_accounts/', methods=['GET', 'POST'])
+@admin_blueprint.route('/edit_accounts/', methods=['GET', 'POST'])
 @login_required
 @admin
 def edit_accounts():
@@ -142,7 +120,7 @@ def edit_accounts():
                 username=session['name']
                 )
 
-@users_blueprint.route('/edit_user/<int:user_id>/', methods=['GET', 'POST'])
+@admin_blueprint.route('/edit_user/<int:user_id>/', methods=['GET', 'POST'])
 @login_required
 @admin
 def edit_user(user_id):
@@ -195,7 +173,7 @@ def edit_user(user_id):
                 e=e
                 )
 
-@users_blueprint.route('/user_info/<user_name>')
+@admin_blueprint.route('/user_info/<user_name>')
 @login_required
 def user_info(user_name):
     un = user_name
@@ -207,7 +185,7 @@ def user_info(user_name):
                 current_user = current_user,
                 )
 
-@users_blueprint.route('/delete/<int:user_id>')
+@admin_blueprint.route('/delete/<int:user_id>')
 @login_required
 @admin
 def delete_user(user_id):

@@ -324,6 +324,146 @@ def SI_closed_feeds():
             username=session['name'],
             )
 
+
+    ################
+    ### VT Hunt ###
+    ################
+
+@research_blueprint.route('/VT_hunt_feeds/', methods=['GET', 'POST'])
+@login_required
+@admin
+def VT_hunt_feeds():
+
+    #delete feeds without a source
+    feeds = db.session.query(Feeds).filter_by(feed_type='strategic_intel')
+    for feed_s in feeds:
+        if feed_s.feed_feedsource == None:
+            feeds_to_delete = db.session.query(Feeds).filter_by(id=feed_s.id)
+            feeds_to_delete.delete()
+            db.session.commit()
+
+    #update the feed pull time
+    new_feedtime = db.session.query(Feed_source).filter_by(feedsource_type='strategic_intel')
+    for n in new_feedtime:    
+        cleantime = datetime.datetime.utcnow()
+        n.feed_update_time = cleantime
+        db.session.commit()
+
+    #delete feeds older than the specified feed time
+    old_feeds = db.session.query(Feeds).filter_by(feed_type='strategic_intel')
+    for feed_time in old_feeds:
+        pattern = '%Y-%m-%d' + ' ' + '%H:%M:%S'
+        epoch = int(time.mktime(time.strptime(str(feed_time.feed_time), pattern)))
+        if time.time() - epoch > (86400*FEED_TIME):
+            feeds_delete = db.session.query(Feeds).filter_by(id=feed_time.id, feed_type='strategic_intel')
+            feeds_delete.delete()
+            db.session.commit()
+
+    #pulls the feeds checks the time, if less than specified pull time
+    #adds to db, if the record already exists its ignored
+    test = db.session.query(Feed_source).filter_by(feedsource_type='strategic_intel')
+    for t in test:
+        entries = feedparser.parse(t.feedsource).entries
+        for e in entries:
+            try:
+                if time.time() - time.mktime(e.published_parsed) < (86400*FEED_TIME):
+                    feed_title = e['title']
+                    feed_link = e['link']
+                    feed_time_struct = e['published_parsed']
+                    feed_time = datetime.datetime.fromtimestamp(time.mktime(feed_time_struct))           
+                    result = Feeds(
+                        feed_confidence = t.sourceconfidence,
+                        feed_feedsource = t.feedsource,
+                        feed_title = feed_title,
+                        feed_link = feed_link,
+                        feed_time = feed_time,
+                        feed_type = 'strategic_intel',
+                        )
+                    try:
+                        db.session.add(result)
+                        db.session.commit()
+                    except IntegrityError:
+                        db.session.rollback()
+            except AttributeError:
+                pass
+
+
+    flash('Feeds were successfully updated')
+    return redirect(url_for('research.SI_research_feeds'))
+
+@research_blueprint.route('/VT_hunt_update_read_feeds/<int:feed_id>')
+@login_required
+def VT_hunt_read_feeds(feed_id):
+
+    f_id = feed_id
+    update_feed_status = db.session.query(Feeds).filter_by(id=f_id)
+    for u in update_feed_status:
+        u.feed_status = False
+    db.session.commit()
+    flash('Article was moved to closed')
+    return redirect(url_for('research.SI_research_feeds'))
+
+@research_blueprint.route('/VT_hunt_feeds/')
+@login_required
+def VT_hunt_research_feeds():
+
+    entries = db.session.query(Feeds).filter_by(feed_status=True).filter_by(feed_type='strategic_intel')
+
+    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='strategic_intel').first()
+    if ut:
+        for u in ut:
+            lt = u
+            entries_sorted = sorted(
+            entries, 
+            key=lambda e: e.feed_confidence)
+
+            return render_template(
+                'SI_feeds.html',
+                entries=entries_sorted,
+                username=session['name'],
+                lt = lt,
+                )
+    else:
+        entries_sorted = sorted(
+        entries,
+        key=lambda e: e.feed_confidence)
+
+        return render_template(
+            'SI_feeds.html',
+            entries=entries_sorted,
+            username=session['name'],
+            )
+
+@research_blueprint.route('/VT_hunt_closed_feeds/')
+@login_required
+def VT_hunt_closed_feeds():
+
+    entries = db.session.query(Feeds).filter_by(feed_status=False, feed_type='strategic_intel')
+
+    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='strategic_intel').first()
+    if ut:
+        for u in ut:
+            lt = u
+            entries_sorted = sorted(
+            entries, 
+            key=lambda e: e.feed_confidence)
+
+            return render_template(
+                'SI_feeds_closed.html',
+                entries=entries_sorted,
+                username=session['name'],
+                lt = lt,
+                )
+    else:
+        entries_sorted = sorted(
+        entries,
+        key=lambda e: e.feed_confidence)
+
+        return render_template(
+            'SI_feeds_closed.html',
+            entries=entries_sorted,
+            username=session['name'],
+            )
     ####################
     ### Feed Sources ###
     ####################

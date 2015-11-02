@@ -1,4 +1,4 @@
-<!-- /app/users/templates/login.html -->
+<!-- /app/login/templates/login.html -->
 
 {% extends "template.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
@@ -19,7 +19,7 @@
 </nav>
 
 <h1>Welcome to Vetted</h1>
-<form class="form-signin" role="form" method="post" action="/users/">
+<form class="form-signin" role="form" method="post" action="/login/">
   {{ form.csrf_token }}
   <div class="lead">Please sign in</div>
     <p>

@@ -22,7 +22,7 @@ def login_required(test):
             return test(*args, **kwargs)
         else:
             flash('you need to login first')
-            return redirect(url_for('users.login'))
+            return redirect(url_for('login.login'))
     return wrap
 
 def admin(test):
@@ -111,7 +111,7 @@ def clean_NBI(nbijson):
 
 @app.route('/', defaults={'page': 'index'})
 def index(page):
-    return(redirect(url_for('users.login')))
+    return(redirect(url_for('login.login')))
 
 ########################
 #### error handlers ####

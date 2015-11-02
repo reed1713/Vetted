@@ -15,9 +15,9 @@
     <style type="text/css">
       body {
         padding-top: 60px;
-        padding-bottom: 40px;
       }
     </style>
+
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
@@ -33,7 +33,7 @@
 
 {% if session.logged_in %}
 
-     <!-- Fixed navbar -->
+    <!-- Fixed navbar -->
     <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #000">
 
         <div class="logo">
@@ -62,7 +62,8 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Research <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                    <li><a href="{{ url_for('research.TI_research_feeds') }}">News</a></li>
+                    <li><a href="{{ url_for('research.TI_research_feeds') }}">News/Notifications</a></li>
+                    <li><a href="">Malware Queue</a></li>
               </ul>
             </li>
 
@@ -81,15 +82,22 @@
            <li><a href="{{ url_for('lists.whitelist_save') }}">Lists</a></li>
 
             {% if session.role == "admin" %}
-                <li><a href="{{ url_for('users.register') }}">Manage Users</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ url_for('admin.settings') }}">Settings</a></li>
+                    <li><a href="{{ url_for('admin.edit_accounts') }}">Manage users</a></li>
+                    <li><a href="{{ url_for('admin.push_rules') }}">Push rules</a></li>
+              </ul>
+            </li>
             {% endif %}
 
           </ul>
 
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="{{ url_for('users.user_info', user_name = username) }}">{{username}} Info</a></li>
+            <li><a href="{{ url_for('admin.user_info', user_name = username) }}">{{username}} Info</a></li>
 
-            <li style="background-color: rgb(16, 66, 142);"><a href="{{ url_for('users.logout') }}">LOGOUT</a></li>
+            <li style="background-color: rgb(16, 66, 142);"><a href="{{ url_for('login.logout') }}">LOGOUT</a></li>
         </ul>
 
         </div><!--/.nav-collapse -->
@@ -127,6 +135,20 @@
 
       </div>
 
+    </div>
+
+
+    <!-- Footer ripped off from cuckoo -->
+    <footer>
+        <div class="container-fluid center">
+            <a href="#">Back to the top</a>
+        </div>
+    </footer>
+
+    <div id="footer-extra">
+        <div class="container-fluid center">
+            <div><a href="https://github.com/reed1713/Vetted" target="_blank">Vetted</a></div>
+        </div>
     </div>
 
 </body>

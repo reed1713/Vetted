@@ -6,9 +6,16 @@
 {% block content %}
 
 <div class="page-header">
-  <h2>Tactical Intel <span class="label label-primary">news</span>
+  <h2>Tactical Intel <span class="label label-primary">news</span></h2>
 
-  <div class="dropdown" style="float: right">
+<ul class="nav nav-pills" style="float: right">
+  <br>
+  <li role="presentation" class="active"><a href="{{ url_for('research.TI_research_feeds') }}">TI intel</a></li>
+  <li role="presentation"><a href="{{ url_for('research.SI_research_feeds') }}">SI intel</a></li>
+  <li role="presentation"><a href="#">VT hunt</a></li>
+</ul>
+
+<!--   <div class="dropdown" style="float: right">
     <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
       News types
       <span class="caret"></span>
@@ -18,7 +25,7 @@
     <li role="separator" class="divider"></li>
       <li><a href="{{ url_for('research.SI_research_feeds') }}">Strategic Intel</a></li>
   </ul>
-  </div>
+  </div> -->
 </div>
 
 <ul class="nav nav-tabs">
@@ -36,7 +43,7 @@
 <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
     <li><a href="{{ url_for('research.list_feeds') }}">Feed sources</a></li>
   <li role="separator" class="divider"></li>
-    <li><a id="update_feeds" href="{{ url_for('research.TI_update_feeds') }}">Update feeds</a></li>
+    <li><a id="update_feeds" href="{{ url_for('research.TI_update_feeds') }}">Update feed</a></li>
 </ul>
 </div>
 {% endif %}
