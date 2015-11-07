@@ -6,19 +6,15 @@
 {% block content %}
 
 <div class="page-header">
-  <h2>Strategic Intel <span class="label label-primary">news</span>
+  <h2>Strategic Intel <span class="label label-primary">news</span></h2>
 
-  <div class="dropdown" style="float: right">
-    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-      News types
-      <span class="caret"></span>
-    </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
-      <li><a href="{{ url_for('research.TI_research_feeds') }}">Tactical Intel</a></li>
-    <li role="separator" class="divider"></li>
-      <li><a href="{{ url_for('research.SI_research_feeds') }}">Strategic Intel</a></li>
-  </ul>
-  </div>
+<ul class="nav nav-pills" style="float: right">
+  <br>
+  <li role="presentation"><a href="{{ url_for('research.TI_research_feeds') }}">TI intel</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('research.SI_research_feeds') }}">SI intel</a></li>
+  <li role="presentation"><a href="{{ url_for('research.VT_hunt_research_feeds') }}">VT hunt</a></li>
+</ul>
+
 </div>
 
 <ul class="nav nav-tabs">

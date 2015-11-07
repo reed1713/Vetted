@@ -127,8 +127,8 @@ def TI_read_feeds(feed_id):
 def TI_research_feeds():
 
     entries = db.session.query(Feeds).filter_by(feed_status=True).filter_by(feed_type='tactical_intel')
-
     ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='tactical_intel').first()
+
     if ut:
         for u in ut:
             lt = u
@@ -267,8 +267,8 @@ def SI_read_feeds(feed_id):
 def SI_research_feeds():
 
     entries = db.session.query(Feeds).filter_by(feed_status=True).filter_by(feed_type='strategic_intel')
-
     ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='strategic_intel').first()
+
     if ut:
         for u in ut:
             lt = u
@@ -329,13 +329,13 @@ def SI_closed_feeds():
     ### VT Hunt ###
     ################
 
-@research_blueprint.route('/VT_hunt_feeds/', methods=['GET', 'POST'])
+@research_blueprint.route('/VT_hunt_update_feeds/', methods=['GET', 'POST'])
 @login_required
 @admin
-def VT_hunt_feeds():
+def VT_hunt_update_feeds():
 
     #delete feeds without a source
-    feeds = db.session.query(Feeds).filter_by(feed_type='strategic_intel')
+    feeds = db.session.query(Feeds).filter_by(feed_type='virus_total_hunt')
     for feed_s in feeds:
         if feed_s.feed_feedsource == None:
             feeds_to_delete = db.session.query(Feeds).filter_by(id=feed_s.id)
@@ -343,25 +343,25 @@ def VT_hunt_feeds():
             db.session.commit()
 
     #update the feed pull time
-    new_feedtime = db.session.query(Feed_source).filter_by(feedsource_type='strategic_intel')
+    new_feedtime = db.session.query(Feed_source).filter_by(feedsource_type='virus_total_hunt')
     for n in new_feedtime:    
         cleantime = datetime.datetime.utcnow()
         n.feed_update_time = cleantime
         db.session.commit()
 
     #delete feeds older than the specified feed time
-    old_feeds = db.session.query(Feeds).filter_by(feed_type='strategic_intel')
+    old_feeds = db.session.query(Feeds).filter_by(feed_type='virus_total_hunt')
     for feed_time in old_feeds:
         pattern = '%Y-%m-%d' + ' ' + '%H:%M:%S'
         epoch = int(time.mktime(time.strptime(str(feed_time.feed_time), pattern)))
         if time.time() - epoch > (86400*FEED_TIME):
-            feeds_delete = db.session.query(Feeds).filter_by(id=feed_time.id, feed_type='strategic_intel')
+            feeds_delete = db.session.query(Feeds).filter_by(id=feed_time.id, feed_type='virus_total_hunt')
             feeds_delete.delete()
             db.session.commit()
 
     #pulls the feeds checks the time, if less than specified pull time
     #adds to db, if the record already exists its ignored
-    test = db.session.query(Feed_source).filter_by(feedsource_type='strategic_intel')
+    test = db.session.query(Feed_source).filter_by(feedsource_type='virus_total_hunt')
     for t in test:
         entries = feedparser.parse(t.feedsource).entries
         for e in entries:
@@ -377,7 +377,7 @@ def VT_hunt_feeds():
                         feed_title = feed_title,
                         feed_link = feed_link,
                         feed_time = feed_time,
-                        feed_type = 'strategic_intel',
+                        feed_type = 'virus_total_hunt',
                         )
                     try:
                         db.session.add(result)
@@ -389,7 +389,7 @@ def VT_hunt_feeds():
 
 
     flash('Feeds were successfully updated')
-    return redirect(url_for('research.SI_research_feeds'))
+    return redirect(url_for('research.VT_hunt_research_feeds'))
 
 @research_blueprint.route('/VT_hunt_update_read_feeds/<int:feed_id>')
 @login_required
@@ -401,15 +401,15 @@ def VT_hunt_read_feeds(feed_id):
         u.feed_status = False
     db.session.commit()
     flash('Article was moved to closed')
-    return redirect(url_for('research.SI_research_feeds'))
+    return redirect(url_for('research.VT_hunt_research_feeds'))
 
-@research_blueprint.route('/VT_hunt_feeds/')
+@research_blueprint.route('/vt_hunt_feeds/')
 @login_required
 def VT_hunt_research_feeds():
 
-    entries = db.session.query(Feeds).filter_by(feed_status=True).filter_by(feed_type='strategic_intel')
+    entries = db.session.query(Feeds).filter_by(feed_status=True).filter_by(feed_type='virus_total_hunt')
+    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='virus_total_hunt').first()
 
-    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='strategic_intel').first()
     if ut:
         for u in ut:
             lt = u
@@ -418,7 +418,7 @@ def VT_hunt_research_feeds():
             key=lambda e: e.feed_confidence)
 
             return render_template(
-                'SI_feeds.html',
+                'VT_feeds.html',
                 entries=entries_sorted,
                 username=session['name'],
                 lt = lt,
@@ -429,7 +429,7 @@ def VT_hunt_research_feeds():
         key=lambda e: e.feed_confidence)
 
         return render_template(
-            'SI_feeds.html',
+            'VT_feeds.html',
             entries=entries_sorted,
             username=session['name'],
             )
@@ -438,9 +438,9 @@ def VT_hunt_research_feeds():
 @login_required
 def VT_hunt_closed_feeds():
 
-    entries = db.session.query(Feeds).filter_by(feed_status=False, feed_type='strategic_intel')
+    entries = db.session.query(Feeds).filter_by(feed_status=False, feed_type='virus_total_hunt')
 
-    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='strategic_intel').first()
+    ut = db.session.query(Feed_source.feed_update_time).filter_by(feedsource_type='virus_total_hunt').first()
     if ut:
         for u in ut:
             lt = u
@@ -449,7 +449,7 @@ def VT_hunt_closed_feeds():
             key=lambda e: e.feed_confidence)
 
             return render_template(
-                'SI_feeds_closed.html',
+                'VT_feeds_closed.html',
                 entries=entries_sorted,
                 username=session['name'],
                 lt = lt,
@@ -460,7 +460,7 @@ def VT_hunt_closed_feeds():
         key=lambda e: e.feed_confidence)
 
         return render_template(
-            'SI_feeds_closed.html',
+            'VT_feeds_closed.html',
             entries=entries_sorted,
             username=session['name'],
             )
@@ -580,3 +580,16 @@ def delete_feedsource(feedsource_id):
     except InvalidRequestError:
         error = ("something broke")
         return redirect(url_for('research.list_feeds'))
+
+
+#####################
+### malware queue ###
+#####################
+
+@research_blueprint.route('/malware_queue/')
+@login_required
+@admin
+def malware_queue():
+    return render_template('malware_queue.html', 
+    username=session['name']
+    )

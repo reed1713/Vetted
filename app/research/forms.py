@@ -15,7 +15,7 @@ class feeds_form(Form):
 	feedsource_type = SelectField(
     	'feed type', 
     	validators=[DataRequired()], 
-    	choices=[('tactical_intel', 'Tactical Intel'), ('strategic_intel', 'Strategic Intel')])
+    	choices=[('tactical_intel', 'Tactical Intel'), ('strategic_intel', 'Strategic Intel'), ('virus_total_hunt', 'Virus Total Hunt')])
 
 class feed_edit_form(Form):
 	feedsource = TextField()
@@ -26,4 +26,4 @@ class feed_edit_form(Form):
 	feedsource_type = SelectField(
 	'feed type', 
 	validators=[DataRequired()], 
-	choices=[('tactical_intel', 'Tactical Intel'), ('strategic_intel', 'Strategic Intel')])
+	choices=[('tactical_intel', 'Tactical Intel'), ('strategic_intel', 'Strategic Intel'), ('virus_total_hunt', 'Virus Total Hunt')])

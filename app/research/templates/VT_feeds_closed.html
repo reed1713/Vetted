@@ -1,4 +1,4 @@
-<!-- app/research/templates/TI_feeds.html -->
+<!-- app/research/templates/VT_feeds_closed.html -->
 
 {% extends "template.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
@@ -6,20 +6,20 @@
 {% block content %}
 
 <div class="page-header">
-  <h2>Tactical Intel <span class="label label-primary">news</span></h2>
+  <h2>Virus Total <span class="label label-primary">notifications</span></h2>
 
 <ul class="nav nav-pills" style="float: right">
   <br>
-  <li role="presentation" class="active"><a href="{{ url_for('research.TI_research_feeds') }}">TI intel</a></li>
+  <li role="presentation"><a href="{{ url_for('research.TI_research_feeds') }}">TI intel</a></li>
   <li role="presentation"><a href="{{ url_for('research.SI_research_feeds') }}">SI intel</a></li>
-  <li role="presentation"><a href="{{ url_for('research.VT_hunt_research_feeds') }}">VT hunt</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('research.VT_hunt_research_feeds') }}">VT hunt</a></li>
 </ul>
 
 </div>
 
 <ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="{{ url_for('research.TI_research_feeds') }}">Open</a></li>
-  <li role="presentation"><a href="{{ url_for('research.TI_closed_feeds') }}">Closed</a></li>
+  <li role="presentation"><a href="{{ url_for('research.VT_hunt_research_feeds') }}">Open</a></li>
+  <li role="presentation" class="active"><a href="{{ url_for('research.VT_hunt_closed_feeds') }}">Closed</a></li>
 </ul>
 
 <h3><span class="label label-default" >Last update: {{ lt }}</span>
@@ -32,7 +32,7 @@
 <ul class="dropdown-menu" aria-labelledby="dropdownMenuDivider">
     <li><a href="{{ url_for('research.list_feeds') }}">Feed sources</a></li>
   <li role="separator" class="divider"></li>
-    <li><a id="update_feeds" href="{{ url_for('research.TI_update_feeds') }}">Update feed</a></li>
+    <li><a id="update_feeds" href="{{ url_for('research.VT_hunt_update_feeds') }}">Update feeds</a></li>
 </ul>
 </div>
 {% endif %}
@@ -60,12 +60,6 @@
 
         <h5>
         <b>Published on: </b> {{ e.feed_time }}
-        <a href="{{ url_for('research.TI_read_feeds', feed_id = e.id) }}" 
-        onclick="window.open('{{ e.feed_link }}');self.focus();return true;" 
-        class="btn btn-md btn-info" 
-        href="{{ url_for('research.TI_read_feeds', feed_id = e.id) }}" 
-        style="float: right" 
-        role="button">Read</a>
         </h5>
 
         <h5>
@@ -92,7 +86,7 @@
 $(document).on("click", "#update_feeds", function(e) {
   var link = $(this).attr("href"); // "get" the intended link in a var
   e.preventDefault();
-  bootbox.confirm("Are you sure you want to update TI feeds? May take some time.", function(result) {
+  bootbox.confirm("Are you sure you want to update VT hunt feeds? May take some time.", function(result) {
   if (result) {
     document.location.href = link;  // if result, "set" the document location
                 }
