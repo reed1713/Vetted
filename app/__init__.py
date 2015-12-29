@@ -1,5 +1,6 @@
 #app/__init__.py
 
+# python lib
 import os
 
 # import debug toolbar
@@ -42,3 +43,8 @@ app.register_blueprint(status_blueprint)
 app.register_blueprint(welcome_blueprint)
 app.register_blueprint(lists_blueprint)
 app.register_blueprint(research_blueprint)
+
+# init db
+def initdb():
+
+	pass

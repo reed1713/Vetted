@@ -19,8 +19,9 @@ import feedparser
 import time
 import datetime
 
-# length of time in days to pull and keep feeds
+# length of time in days
 FEED_TIME = 7
+MALWARE_QUEUE_TIME = 30
 
 ################
 #### helper ####

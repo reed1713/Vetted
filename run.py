@@ -3,6 +3,7 @@ import os
 
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
+from app import initdb
 
 from app import app, db
 
@@ -15,4 +16,5 @@ manager.add_command('db', MigrateCommand)
 app.run(host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
+	initdb()
 	manager.run()

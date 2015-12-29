@@ -6,10 +6,15 @@ import re
 
 #local methods
 from Tconverter import *
+from app import db
+from app.models import Settings
 
 #global vars
 WHITELISTPATH = 'app/lists/whitelist.txt'
 DOCPATH = 'app/documents/'
+
+# TEST = db.session.query(Settings.whitelistpath).first()
+# print TEST
 
 # some regex pulled from https://github.com/armbues/ioc-parser/blob/master/patterns.ini
 # and a lot of the whitelist examples are pulled from https://github.com/armbues/ioc-parser/tree/master/whitelists

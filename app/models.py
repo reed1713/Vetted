@@ -655,3 +655,10 @@ class Feeds(db.Model):
 ##############
 ## Settings ##
 ##############
+
+# class Settings(db.Model):
+
+#     __tablename__ = 'settings'
+
+#     def __repr__(self):
+#         return '<id {}>'.format(self.id)
