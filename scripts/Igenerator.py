@@ -7,7 +7,7 @@ import re
 #local methods
 from Tconverter import *
 from app import db
-from app.models import Settings
+#from app.models import Settings
 
 #global vars
 WHITELISTPATH = 'app/lists/whitelist.txt'
